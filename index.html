@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UK Emergency RP</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #111;
+      font-family: Arial, sans-serif;
+    }
+
+    #game {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #interaction {
+      position: fixed;
+      left: 50%;
+      bottom: 80px;
+      transform: translateX(-50%);
+      background: rgba(10, 15, 25, 0.9);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.2);
+      display: none;
+      font-size: 16px;
+    }
+
+    #interaction span {
+      background: white;
+      color: black;
+      padding: 4px 8px;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    #crosshair {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 20px;
+      pointer-events: none;
+    }
+
+    #controls {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      color: white;
+      background: rgba(0,0,0,0.55);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="game"></div>
+
+  <div id="crosshair">+</div>
+
+  <div id="interaction">
+    <span>E</span>
+    <b id="interactionText">Interact</b>
+  </div>
+
+  <div id="controls">
+    <b>WASD</b> Move<br>
+    <b>SHIFT</b> Sprint<br>
+    <b>E</b> Interact
+  </div>
+
+  <script type="module">
+
+    import * as THREE from
+      "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+
+    // -------------------------
+    // GAME SETUP
+    // -------------------------
+
+    const game = document.getElementById("game");
+
+    const scene = new THREE.Scene();
+
+    scene.background = new THREE.Color(0x87ceeb);
+
+    const camera = new THREE.PerspectiveCamera(
+      70,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true
+    });
+
+    renderer.setSize(
+      window.innerWidth,
+      window.innerHeight
+    );
+
+    renderer.shadowMap.enabled = true;
+
+    game.appendChild(renderer.domElement);
+
+
+    // -------------------------
+    // LIGHTING
+    // -------------------------
+
+    const sunlight = new THREE.DirectionalLight(
+      0xffffff,
+      2
+    );
+
+    sunlight.position.set(
+      50,
+      100,
+      50
+    );
+
+    sunlight.castShadow = true;
+
+    scene.add(sunlight);
+
+
+    const ambient = new THREE.AmbientLight(
+      0xffffff,
+      0.6
+    );
+
+    scene.add(ambient);
+
+
+    // -------------------------
+    // GROUND
+    // -------------------------
+
+    const groundGeometry =
+      new THREE.PlaneGeometry(
+        500,
+        500
+      );
+
+    const groundMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0x3b7d3b
+      });
+
+    const ground =
+      new THREE.Mesh(
+        groundGeometry,
+        groundMaterial
+      );
+
+    ground.rotation.x =
+      -Math.PI / 2;
+
+    ground.receiveShadow = true;
+
+    scene.add(ground);
+
+
+    // -------------------------
+    // ROAD
+    // -------------------------
+
+    const roadGeometry =
+      new THREE.BoxGeometry(
+        30,
+        0.1,
+        500
+      );
+
+    const roadMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0x333333
+      });
+
+    const road =
+      new THREE.Mesh(
+        roadGeometry,
+        roadMaterial
+      );
+
+    road.position.y = 0.05;
+
+    scene.add(road);
+
+
+    // -------------------------
+    // PLAYER
+    // -------------------------
+
+    const player =
+      new THREE.Group();
+
+    // Body
+
+    const body =
+      new THREE.Mesh(
+        new THREE.BoxGeometry(
+          1,
+          1.5,
+          0.6
+        ),
+        new THREE.MeshStandardMaterial({
+          color: 0x2563eb
+        })
+      );
+
+    body.position.y = 1.5;
+
+    body.castShadow = true;
+
+    player.add(body);
+
+
+    // Head
+
+    const head =
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          0.4,
+          16,
+          16
+        ),
+        new THREE.MeshStandardMaterial({
+          color: 0xffc9a5
+        })
+      );
+
+    head.position.y = 2.55;
+
+    head.castShadow = true;
+
+    player.add(head);
+
+
+    player.position.set(
+      0,
+      0,
+      10
+    );
+
+    scene.add(player);
+
+
+    // -------------------------
+    // CAMERA
+    // -------------------------
+
+    camera.position.set(
+      0,
+      5,
+      12
+    );
+
+
+    // -------------------------
+    // CONTROLS
+    // -------------------------
+
+    const keys = {};
+
+    window.addEventListener(
+      "keydown",
+      event => {
+
+        keys[event.key.toLowerCase()] = true;
+
+        if (
+          event.key.toLowerCase() === "e"
+        ) {
+          interact();
+        }
+
+      }
+    );
+
+
+    window.addEventListener(
+      "keyup",
+      event => {
+
+        keys[event.key.toLowerCase()] =
+          false;
+
+      }
+    );
+
+
+    // -------------------------
+    // INTERACTION
+    // -------------------------
+
+    let nearbyInteraction = null;
+
+    function interact() {
+
+      if (!nearbyInteraction)
+        return;
+
+      console.log(
+        "Interaction:",
+        nearbyInteraction
+      );
+
+      alert(
+        nearbyInteraction
+      );
+
+    }
+
+
+    // -------------------------
+    // BUILDING
+    // -------------------------
+
+    function createBuilding(
+      x,
+      z,
+      width,
+      depth,
+      height
+    ) {
+
+      const building =
+        new THREE.Group();
+
+
+      const body =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            width,
+            height,
+            depth
+          ),
+          new THREE.MeshStandardMaterial({
+            color: 0xb8b8b8
+          })
+        );
+
+      body.position.y =
+        height / 2;
+
+      body.castShadow = true;
+
+      building.add(body);
+
+
+      // Windows
+
+      const windowMaterial =
+        new THREE.MeshStandardMaterial({
+          color: 0x72b7d9,
+          metalness: 0.2,
+          roughness: 0.2
+        });
+
+
+      for (
+        let y = 2;
+        y < height;
+        y += 3
+      ) {
+
+        for (
+          let wx = -width / 2 + 2;
+          wx < width / 2;
+          wx += 4
+        ) {
+
+          const window =
+            new THREE.Mesh(
+              new THREE.BoxGeometry(
+                1.5,
+                1.3,
+                0.08
+              ),
+              windowMaterial
+            );
+
+          window.position.set(
+            wx,
+            y,
+            depth / 2 + 0.05
+          );
+
+          building.add(window);
+
+        }
+
+      }
+
+
+      building.position.set(
+        x,
+        0,
+        z
+      );
+
+      scene.add(building);
+
+    }
+
+
+    // -------------------------
+    // CITY
+    // -------------------------
+
+    createBuilding(
+      -35,
+      -30,
+      20,
+      20,
+      15
+    );
+
+    createBuilding(
+      35,
+      -50,
+      25,
+      20,
+      20
+    );
+
+    createBuilding(
+      -35,
+      30,
+      18,
+      25,
+      12
+    );
+
+    createBuilding(
+      35,
+      40,
+      25,
+      20,
+      18
+    );
+
+
+    // -------------------------
+    // GAME LOOP
+    // -------------------------
+
+    const clock =
+      new THREE.Clock();
+
+
+    function animate() {
+
+      requestAnimationFrame(
+        animate
+      );
+
+      const delta =
+        clock.getDelta();
+
+
+      let speed = 6;
+
+      if (keys["shift"])
+        speed = 11;
+
+
+      const movement =
+        speed * delta;
+
+
+      if (keys["w"])
+        player.position.z -= movement;
+
+      if (keys["s"])
+        player.position.z += movement;
+
+      if (keys["a"])
+        player.position.x -= movement;
+
+      if (keys["d"])
+        player.position.x += movement;
+
+
+      // Camera follows player
+
+      camera.position.x =
+        player.position.x;
+
+      camera.position.z =
+        player.position.z + 12;
+
+      camera.lookAt(
+        player.position.x,
+        1.5,
+        player.position.z
+      );
+
+
+      // Example interaction zone
+
+      const distance =
+        player.position.distanceTo(
+          new THREE.Vector3(
+            0,
+            0,
+            0
+          )
+        );
+
+
+      const interaction =
+        document.getElementById(
+          "interaction"
+        );
+
+
+      if (distance < 8) {
+
+        nearbyInteraction =
+          "Open City Interaction";
+
+        interaction.style.display =
+          "block";
+
+        document.getElementById(
+          "interactionText"
+        ).textContent =
+          nearbyInteraction;
+
+      } else {
+
+        nearbyInteraction = null;
+
+        interaction.style.display =
+          "none";
+
+      }
+
+
+      renderer.render(
+        scene,
+        camera
+      );
+
+    }
+
+
+    animate();
+
+
+    // -------------------------
+    // RESIZE
+    // -------------------------
+
+    window.addEventListener(
+      "resize",
+      () => {
+
+        camera.aspect =
+          window.innerWidth /
+          window.innerHeight;
+
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(
+          window.innerWidth,
+          window.innerHeight
+        );
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
