@@ -1,204 +1,699 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>UK Emergency RP</title>
 
+
   <style>
+
     * {
       box-sizing: border-box;
     }
 
+
     html,
     body {
+
       margin: 0;
+
       width: 100%;
       height: 100%;
+
       overflow: hidden;
-      font-family: Arial, Helvetica, sans-serif;
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
       background: #111;
+
     }
+
 
     #game {
+
       width: 100vw;
       height: 100vh;
+
     }
+
 
     canvas {
+
       display: block;
+
     }
 
+
+    /* =========================
+       INTERACTION
+    ========================= */
+
     #interaction {
+
       position: fixed;
+
       left: 50%;
       bottom: 80px;
-      transform: translateX(-50%);
+
+      transform:
+        translateX(-50%);
 
       display: none;
 
-      padding: 12px 20px;
+      padding:
+        12px 20px;
 
       color: white;
-      background: rgba(10, 15, 25, 0.92);
 
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
+      background:
+        rgba(
+          10,
+          15,
+          25,
+          0.92
+        );
 
-      font-size: 16px;
+      border:
+        1px solid
+        rgba(
+          255,
+          255,
+          255,
+          0.2
+        );
+
+      border-radius:
+        10px;
+
+      font-size:
+        16px;
 
       box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.35);
+        0 8px 30px
+        rgba(
+          0,
+          0,
+          0,
+          0.35
+        );
 
-      pointer-events: none;
+      pointer-events:
+        none;
+
     }
+
 
     #interaction span {
-      display: inline-block;
 
-      margin-right: 8px;
-      padding: 5px 9px;
+      display:
+        inline-block;
 
-      color: #111;
-      background: white;
+      margin-right:
+        8px;
 
-      border-radius: 6px;
+      padding:
+        5px 9px;
 
-      font-weight: 800;
+      color:
+        #111;
+
+      background:
+        white;
+
+      border-radius:
+        6px;
+
+      font-weight:
+        800;
+
     }
 
+
+    /* =========================
+       CROSSHAIR
+    ========================= */
+
     #crosshair {
-      position: fixed;
 
-      left: 50%;
-      top: 50%;
+      position:
+        fixed;
 
-      transform: translate(-50%, -50%);
+      left:
+        50%;
 
-      color: white;
+      top:
+        50%;
 
-      font-size: 20px;
-      font-weight: bold;
+      transform:
+        translate(
+          -50%,
+          -50%
+        );
 
-      pointer-events: none;
+      color:
+        white;
+
+      font-size:
+        20px;
+
+      font-weight:
+        bold;
+
+      pointer-events:
+        none;
 
       text-shadow:
         0 1px 3px black;
+
     }
+
+
+    /* =========================
+       CONTROLS
+    ========================= */
 
     #controls {
-      position: fixed;
 
-      left: 20px;
-      bottom: 20px;
+      position:
+        fixed;
 
-      padding: 12px 16px;
+      left:
+        20px;
 
-      color: white;
+      bottom:
+        20px;
 
-      background: rgba(0, 0, 0, 0.6);
+      padding:
+        12px 16px;
 
-      border-radius: 10px;
+      color:
+        white;
 
-      font-size: 13px;
+      background:
+        rgba(
+          0,
+          0,
+          0,
+          0.6
+        );
 
-      line-height: 1.7;
+      border-radius:
+        10px;
 
-      pointer-events: none;
+      font-size:
+        13px;
+
+      line-height:
+        1.7;
+
+      pointer-events:
+        none;
+
     }
+
+
+    /* =========================
+       HUD
+    ========================= */
 
     #hud {
-      position: fixed;
 
-      top: 20px;
-      left: 20px;
+      position:
+        fixed;
 
-      min-width: 220px;
+      top:
+        20px;
 
-      padding: 14px 16px;
+      left:
+        20px;
 
-      color: white;
+      min-width:
+        220px;
 
-      background: rgba(10, 15, 25, 0.82);
+      padding:
+        14px 16px;
 
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      color:
+        white;
 
-      border-radius: 12px;
+      background:
+        rgba(
+          10,
+          15,
+          25,
+          0.82
+        );
+
+      border:
+        1px solid
+        rgba(
+          255,
+          255,
+          255,
+          0.12
+        );
+
+      border-radius:
+        12px;
 
       box-shadow:
-        0 8px 30px rgba(0, 0, 0, 0.25);
+        0 8px 30px
+        rgba(
+          0,
+          0,
+          0,
+          0.25
+        );
 
-      pointer-events: none;
+      pointer-events:
+        none;
+
     }
+
 
     #hudTitle {
-      margin-bottom: 8px;
 
-      font-size: 18px;
-      font-weight: 800;
+      margin-bottom:
+        8px;
+
+      font-size:
+        18px;
+
+      font-weight:
+        800;
+
     }
+
 
     .hudRow {
-      display: flex;
-      justify-content: space-between;
 
-      gap: 25px;
+      display:
+        flex;
 
-      margin-top: 4px;
+      justify-content:
+        space-between;
 
-      font-size: 13px;
+      gap:
+        25px;
+
+      margin-top:
+        4px;
+
+      font-size:
+        13px;
+
     }
+
 
     .hudValue {
-      font-weight: 700;
+
+      font-weight:
+        700;
+
     }
+
+
+    /* =========================
+       WANTED
+    ========================= */
 
     #wanted {
-      display: none;
 
-      position: fixed;
+      display:
+        none;
 
-      top: 20px;
-      right: 20px;
+      position:
+        fixed;
 
-      padding: 12px 16px;
+      top:
+        20px;
 
-      color: white;
+      right:
+        20px;
 
-      background: rgba(120, 0, 0, 0.85);
+      padding:
+        12px 16px;
 
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      color:
+        white;
 
-      border-radius: 10px;
+      background:
+        rgba(
+          120,
+          0,
+          0,
+          0.85
+        );
 
-      font-weight: 700;
+      border:
+        1px solid
+        rgba(
+          255,
+          255,
+          255,
+          0.15
+        );
+
+      border-radius:
+        10px;
+
+      font-weight:
+        700;
+
     }
+
+
+    /* =========================
+       MOUSE HINT
+    ========================= */
 
     #mouseHint {
-      position: fixed;
 
-      right: 20px;
-      bottom: 20px;
+      position:
+        fixed;
 
-      padding: 10px 14px;
+      right:
+        20px;
 
-      color: white;
+      bottom:
+        20px;
 
-      background: rgba(0, 0, 0, 0.55);
+      padding:
+        10px 14px;
 
-      border-radius: 9px;
+      color:
+        white;
 
-      font-size: 12px;
+      background:
+        rgba(
+          0,
+          0,
+          0,
+          0.55
+        );
 
-      pointer-events: none;
+      border-radius:
+        9px;
+
+      font-size:
+        12px;
+
+      pointer-events:
+        none;
+
     }
+
+
+    /* =========================
+       VEHICLE MENU
+    ========================= */
+
+    #vehicleMenu {
+
+      position:
+        fixed;
+
+      left:
+        50%;
+
+      top:
+        50%;
+
+      transform:
+        translate(
+          -50%,
+          -50%
+        );
+
+      width:
+        520px;
+
+      max-width:
+        90vw;
+
+      max-height:
+        75vh;
+
+      overflow-y:
+        auto;
+
+      padding:
+        24px;
+
+      color:
+        white;
+
+      background:
+        rgba(
+          10,
+          15,
+          25,
+          0.97
+        );
+
+      border:
+        1px solid
+        rgba(
+          255,
+          255,
+          255,
+          0.15
+        );
+
+      border-radius:
+        16px;
+
+      box-shadow:
+        0 20px 60px
+        rgba(
+          0,
+          0,
+          0,
+          0.55
+        );
+
+      display:
+        none;
+
+      z-index:
+        20;
+
+    }
+
+
+    #vehicleMenu h2 {
+
+      margin-top:
+        0;
+
+      margin-bottom:
+        6px;
+
+    }
+
+
+    #vehicleMenu p {
+
+      color:
+        #aab3c5;
+
+      font-size:
+        13px;
+
+    }
+
+
+    .vehicleCard {
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        space-between;
+
+      gap:
+        15px;
+
+      margin-top:
+        12px;
+
+      padding:
+        14px;
+
+      background:
+        rgba(
+          255,
+          255,
+          255,
+          0.06
+        );
+
+      border:
+        1px solid
+        rgba(
+          255,
+          255,
+          255,
+          0.08
+        );
+
+      border-radius:
+        10px;
+
+    }
+
+
+    .vehicleInfo strong {
+
+      display:
+        block;
+
+      margin-bottom:
+        4px;
+
+    }
+
+
+    .vehicleInfo small {
+
+      color:
+        #aab3c5;
+
+    }
+
+
+    .vehicleButton {
+
+      border:
+        none;
+
+      padding:
+        9px 14px;
+
+      border-radius:
+        8px;
+
+      color:
+        white;
+
+      background:
+        #2563eb;
+
+      cursor:
+        pointer;
+
+      font-weight:
+        700;
+
+    }
+
+
+    .vehicleButton:hover {
+
+      background:
+        #1d4ed8;
+
+    }
+
+
+    #closeVehicleMenu {
+
+      width:
+        100%;
+
+      margin-top:
+        18px;
+
+      padding:
+        11px;
+
+      border:
+        none;
+
+      border-radius:
+        9px;
+
+      color:
+        white;
+
+      background:
+        #333;
+
+      cursor:
+        pointer;
+
+    }
+
+
+    /* =========================
+       NOTIFICATION
+    ========================= */
+
+    #notification {
+
+      position:
+        fixed;
+
+      left:
+        50%;
+
+      top:
+        25px;
+
+      transform:
+        translateX(-50%);
+
+      padding:
+        12px 20px;
+
+      color:
+        white;
+
+      background:
+        rgba(
+          10,
+          15,
+          25,
+          0.95
+        );
+
+      border-radius:
+        10px;
+
+      display:
+        none;
+
+      z-index:
+        30;
+
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
+
   <div id="game"></div>
+
+
+  <!-- HUD -->
 
   <div id="hud">
 
@@ -206,8 +701,12 @@
       UK Emergency RP
     </div>
 
+
     <div class="hudRow">
-      <span>Job</span>
+
+      <span>
+        Job
+      </span>
 
       <span
         id="job"
@@ -215,10 +714,15 @@
       >
         Civilian
       </span>
+
     </div>
 
+
     <div class="hudRow">
-      <span>Money</span>
+
+      <span>
+        Money
+      </span>
 
       <span
         id="money"
@@ -226,10 +730,15 @@
       >
         £500
       </span>
+
     </div>
 
+
     <div class="hudRow">
-      <span>XP</span>
+
+      <span>
+        XP
+      </span>
 
       <span
         id="xp"
@@ -237,30 +746,41 @@
       >
         0
       </span>
+
     </div>
 
   </div>
 
 
+  <!-- WANTED -->
+
   <div id="wanted">
 
     🚨 WANTED
 
-    <span id="wantedLevel">
+    <span
+      id="wantedLevel"
+    >
       0
     </span>
 
   </div>
 
 
+  <!-- CROSSHAIR -->
+
   <div id="crosshair">
     +
   </div>
 
 
+  <!-- INTERACTION -->
+
   <div id="interaction">
 
-    <span>E</span>
+    <span>
+      E
+    </span>
 
     <b id="interactionText">
       Interact
@@ -269,36 +789,92 @@
   </div>
 
 
+  <!-- CONTROLS -->
+
   <div id="controls">
 
-    <b>W A S D</b> Move<br>
-    <b>SHIFT</b> Sprint<br>
-    <b>E</b> Interact
+    <b>W A S D</b>
+    Move / Drive
+
+    <br>
+
+    <b>SHIFT</b>
+    Sprint / Speed
+
+    <br>
+
+    <b>E</b>
+    Interact
 
   </div>
 
 
+  <!-- MOUSE -->
+
   <div id="mouseHint">
 
-    Hold <b>RIGHT CLICK</b> + move mouse to look
+    Hold
+    <b>RIGHT CLICK</b>
+    + move mouse
 
+  </div>
+
+
+  <!-- VEHICLE MENU -->
+
+  <div id="vehicleMenu">
+
+    <h2>
+      🚗 Vehicle Dealership
+    </h2>
+
+    <p>
+      Select a vehicle to purchase.
+    </p>
+
+
+    <div id="vehicleList">
+    </div>
+
+
+    <button
+      id="closeVehicleMenu"
+    >
+      Close
+    </button>
+
+  </div>
+
+
+  <!-- NOTIFICATION -->
+
+  <div id="notification">
   </div>
 
 
   <script type="module">
 
+
+    // ==================================================
+    // IMPORTS
+    // ==================================================
+
     import * as THREE from
       "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-    import { createPlayer } from "./player.js";
+
+    import { createPlayer } from
+      "./player.js";
 
 
     // ==================================================
-    // GAME SETUP
+    // GAME
     // ==================================================
 
     const game =
-      document.getElementById("game");
+      document.getElementById(
+        "game"
+      );
 
 
     const scene =
@@ -323,7 +899,8 @@
 
     const renderer =
       new THREE.WebGLRenderer({
-        antialias: true
+        antialias:
+          true
       });
 
 
@@ -395,14 +972,17 @@
 
     const ground =
       new THREE.Mesh(
+
         new THREE.PlaneGeometry(
           500,
           500
         ),
 
         new THREE.MeshStandardMaterial({
-          color: 0x3b7d3b
+          color:
+            0x3b7d3b
         })
+
       );
 
 
@@ -425,6 +1005,7 @@
 
     const road =
       new THREE.Mesh(
+
         new THREE.BoxGeometry(
           30,
           0.1,
@@ -432,8 +1013,10 @@
         ),
 
         new THREE.MeshStandardMaterial({
-          color: 0x333333
+          color:
+            0x333333
         })
+
       );
 
 
@@ -452,7 +1035,8 @@
 
     const roadLineMaterial =
       new THREE.MeshStandardMaterial({
-        color: 0xffffff
+        color:
+          0xffffff
       });
 
 
@@ -464,6 +1048,7 @@
 
       const line =
         new THREE.Mesh(
+
           new THREE.BoxGeometry(
             0.25,
             0.03,
@@ -471,6 +1056,7 @@
           ),
 
           roadLineMaterial
+
         );
 
 
@@ -509,7 +1095,7 @@
 
 
     // ==================================================
-    // CAMERA SETTINGS
+    // CAMERA
     // ==================================================
 
     let cameraYaw =
@@ -557,7 +1143,7 @@
           === "e"
         ) {
 
-          interact();
+          handleInteraction();
 
         }
 
@@ -578,7 +1164,7 @@
 
 
     // ==================================================
-    // RIGHT MOUSE CAMERA
+    // RIGHT CLICK CAMERA
     // ==================================================
 
     renderer.domElement.addEventListener(
@@ -660,17 +1246,803 @@
 
 
     // ==================================================
-    // INTERACTION
+    // VEHICLE DATA
     // ==================================================
 
-    let nearbyInteraction =
+    const vehicles = [
+
+      {
+        id:
+          "hatchback",
+
+        name:
+          "UK Hatchback",
+
+        price:
+          0,
+
+        type:
+          "Civilian",
+
+        color:
+          0xeeeeee
+
+      },
+
+      {
+        id:
+          "saloon",
+
+        name:
+          "UK Saloon",
+
+        price:
+          2500,
+
+        type:
+          "Civilian",
+
+        color:
+          0x222222
+
+      },
+
+      {
+        id:
+          "suv",
+
+        name:
+          "UK SUV",
+
+        price:
+          5000,
+
+        type:
+          "Civilian",
+
+        color:
+          0x555555
+
+      },
+
+      {
+        id:
+          "police",
+
+        name:
+          "Police Response",
+
+        price:
+          15000,
+
+        type:
+          "Police",
+
+        color:
+          0x111111,
+
+        emergency:
+          true
+
+      },
+
+      {
+        id:
+          "fire",
+
+        name:
+          "Fire Engine",
+
+        price:
+          30000,
+
+        type:
+          "Fire",
+
+        color:
+          0xcc2222,
+
+        emergency:
+          true
+
+      },
+
+      {
+        id:
+          "ambulance",
+
+        name:
+          "Ambulance",
+
+        price:
+          25000,
+
+        type:
+          "Ambulance",
+
+        color:
+          0xffffff,
+
+        emergency:
+          true
+
+      },
+
+      {
+        id:
+          "hems",
+
+        name:
+          "HEMS Response",
+
+        price:
+          50000,
+
+        type:
+          "HEMS",
+
+        color:
+          0xffff00,
+
+        emergency:
+          true
+
+      }
+
+    ];
+
+
+    // ==================================================
+    // CURRENT VEHICLE
+    // ==================================================
+
+    let currentVehicle =
       null;
 
 
-    function interact() {
+    let currentVehicleData =
+      null;
+
+
+    let inVehicle =
+      false;
+
+
+    // ==================================================
+    // VEHICLE CREATION
+    // ==================================================
+
+    function createVehicle(
+      data
+    ) {
+
+      const vehicle =
+        new THREE.Group();
+
+
+      vehicle.name =
+        data.name;
+
+
+      // BODY
+
+      const body =
+        new THREE.Mesh(
+
+          new THREE.BoxGeometry(
+            2.1,
+            0.65,
+            4
+          ),
+
+          new THREE.MeshStandardMaterial({
+            color:
+              data.color
+          })
+
+        );
+
+
+      body.position.y =
+        0.9;
+
+
+      body.castShadow =
+        true;
+
+
+      vehicle.add(
+        body
+      );
+
+
+      // ROOF
+
+      const roof =
+        new THREE.Mesh(
+
+          new THREE.BoxGeometry(
+            1.7,
+            0.6,
+            2
+          ),
+
+          new THREE.MeshStandardMaterial({
+            color:
+              data.color
+          })
+
+        );
+
+
+      roof.position.y =
+        1.5;
+
+
+      roof.castShadow =
+        true;
+
+
+      vehicle.add(
+        roof
+      );
+
+
+      // WINDOWS
+
+      const windowMaterial =
+        new THREE.MeshStandardMaterial({
+          color:
+            0x6da7c7,
+
+          metalness:
+            0.2,
+
+          roughness:
+            0.2
+
+        });
+
+
+      const frontWindow =
+        new THREE.Mesh(
+
+          new THREE.BoxGeometry(
+            1.45,
+            0.45,
+            0.08
+          ),
+
+          windowMaterial
+
+        );
+
+
+      frontWindow.position.set(
+        0,
+        1.55,
+        1.03
+      );
+
+
+      vehicle.add(
+        frontWindow
+      );
+
+
+      const rearWindow =
+        new THREE.Mesh(
+
+          new THREE.BoxGeometry(
+            1.45,
+            0.45,
+            0.08
+          ),
+
+          windowMaterial
+
+        );
+
+
+      rearWindow.position.set(
+        0,
+        1.55,
+        -1.03
+      );
+
+
+      vehicle.add(
+        rearWindow
+      );
+
+
+      // WHEELS
+
+      const wheelMaterial =
+        new THREE.MeshStandardMaterial({
+          color:
+            0x111111
+        });
+
+
+      const wheelPositions = [
+
+        [-1.05, 0.55, 1.25],
+
+        [1.05, 0.55, 1.25],
+
+        [-1.05, 0.55, -1.25],
+
+        [1.05, 0.55, -1.25]
+
+      ];
+
+
+      for (
+        const position
+        of wheelPositions
+      ) {
+
+        const wheel =
+          new THREE.Mesh(
+
+            new THREE.CylinderGeometry(
+              0.42,
+              0.42,
+              0.25,
+              20
+            ),
+
+            wheelMaterial
+
+          );
+
+
+        wheel.rotation.z =
+          Math.PI / 2;
+
+
+        wheel.position.set(
+          position[0],
+          position[1],
+          position[2]
+        );
+
+
+        wheel.castShadow =
+          true;
+
+
+        vehicle.add(
+          wheel
+        );
+
+      }
+
+
+      // ==================================================
+      // EMERGENCY LIGHT BAR
+      // ==================================================
 
       if (
-        !nearbyInteraction
+        data.emergency
+      ) {
+
+        const lightBar =
+          new THREE.Mesh(
+
+            new THREE.BoxGeometry(
+              1.3,
+              0.15,
+              0.35
+            ),
+
+            new THREE.MeshStandardMaterial({
+              color:
+                0x0055ff,
+
+              emissive:
+                0x0033ff,
+
+              emissiveIntensity:
+                2
+            })
+
+          );
+
+
+        lightBar.position.y =
+          1.9;
+
+
+        vehicle.add(
+          lightBar
+        );
+
+      }
+
+
+      vehicle.userData =
+        {
+
+          vehicleData:
+            data,
+
+          speed:
+            0,
+
+          maxSpeed:
+            18,
+
+          acceleration:
+            10,
+
+          braking:
+            16,
+
+          steering:
+            2.2
+
+        };
+
+
+      return vehicle;
+
+    }
+
+
+    // ==================================================
+    // VEHICLE DEALERSHIP
+    // ==================================================
+
+    const dealership =
+      new THREE.Group();
+
+
+    dealership.position.set(
+      8,
+      0,
+      0
+    );
+
+
+    scene.add(
+      dealership
+    );
+
+
+    // Dealership building
+
+    const dealershipBuilding =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          10,
+          6,
+          10
+        ),
+
+        new THREE.MeshStandardMaterial({
+          color:
+            0x777777
+        })
+
+      );
+
+
+    dealershipBuilding.position.y =
+      3;
+
+
+    dealership.add(
+      dealershipBuilding
+    );
+
+
+    // Dealership sign
+
+    const sign =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          7,
+          1,
+          0.2
+        ),
+
+        new THREE.MeshStandardMaterial({
+          color:
+            0x2563eb,
+
+          emissive:
+            0x102f8f,
+
+          emissiveIntensity:
+            0.8
+        })
+
+      );
+
+
+    sign.position.set(
+      0,
+      5,
+      5.1
+    );
+
+
+    dealership.add(
+      sign
+    );
+
+
+    // ==================================================
+    // VEHICLE MENU
+    // ==================================================
+
+    const vehicleMenu =
+      document.getElementById(
+        "vehicleMenu"
+      );
+
+
+    const vehicleList =
+      document.getElementById(
+        "vehicleList"
+      );
+
+
+    function openVehicleMenu() {
+
+      vehicleList.innerHTML =
+        "";
+
+
+      for (
+        const vehicle
+        of vehicles
+      ) {
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+
+        card.className =
+          "vehicleCard";
+
+
+        const info =
+          document.createElement(
+            "div"
+          );
+
+
+        info.className =
+          "vehicleInfo";
+
+
+        const title =
+          document.createElement(
+            "strong"
+          );
+
+
+        title.textContent =
+          vehicle.name;
+
+
+        const description =
+          document.createElement(
+            "small"
+          );
+
+
+        description.textContent =
+          vehicle.type +
+          " • £" +
+          vehicle.price.toLocaleString();
+
+
+        info.appendChild(
+          title
+        );
+
+
+        info.appendChild(
+          description
+        );
+
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+
+        button.className =
+          "vehicleButton";
+
+
+        button.textContent =
+          vehicle.price === 0
+            ? "Spawn"
+            : "Buy";
+
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            purchaseVehicle(
+              vehicle
+            );
+
+          }
+        );
+
+
+        card.appendChild(
+          info
+        );
+
+
+        card.appendChild(
+          button
+        );
+
+
+        vehicleList.appendChild(
+          card
+        );
+
+      }
+
+
+      vehicleMenu.style.display =
+        "block";
+
+    }
+
+
+    document
+      .getElementById(
+        "closeVehicleMenu"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          vehicleMenu.style.display =
+            "none";
+
+        }
+      );
+
+
+    // ==================================================
+    // NOTIFICATIONS
+    // ==================================================
+
+    function notify(
+      message
+    ) {
+
+      const notification =
+        document.getElementById(
+          "notification"
+        );
+
+
+      notification.textContent =
+        message;
+
+
+      notification.style.display =
+        "block";
+
+
+      setTimeout(
+        () => {
+
+          notification.style.display =
+            "none";
+
+        },
+        2500
+      );
+
+    }
+
+
+    // ==================================================
+    // BUY / SPAWN VEHICLE
+    // ==================================================
+
+    function purchaseVehicle(
+      data
+    ) {
+
+      if (
+        currentVehicle
+      ) {
+
+        scene.remove(
+          currentVehicle
+        );
+
+
+        currentVehicle =
+          null;
+
+      }
+
+
+      if (
+        player.userData.money <
+        data.price
+      ) {
+
+        notify(
+          "You don't have enough money."
+        );
+
+        return;
+
+      }
+
+
+      player.userData.money -=
+        data.price;
+
+
+      currentVehicle =
+        createVehicle(
+          data
+        );
+
+
+      currentVehicle.position.set(
+        player.position.x + 4,
+        0,
+        player.position.z
+      );
+
+
+      currentVehicle.rotation.y =
+        player.rotation.y;
+
+
+      scene.add(
+        currentVehicle
+      );
+
+
+      currentVehicleData =
+        data;
+
+
+      vehicleMenu.style.display =
+        "none";
+
+
+      notify(
+        data.name +
+        " spawned."
+      );
+
+    }
+
+
+    // ==================================================
+    // ENTER VEHICLE
+    // ==================================================
+
+    function enterVehicle() {
+
+      if (
+        !currentVehicle
       ) {
 
         return;
@@ -678,320 +2050,214 @@
       }
 
 
-      console.log(
-        "Interaction:",
-        nearbyInteraction
-      );
+      const distance =
+        player.position.distanceTo(
+          currentVehicle.position
+        );
 
 
-      alert(
-        nearbyInteraction
+      if (
+        distance > 5
+      ) {
+
+        return;
+
+      }
+
+
+      inVehicle =
+        true;
+
+
+      player.userData.inVehicle =
+        true;
+
+
+      player.userData.vehicle =
+        currentVehicle;
+
+
+      player.visible =
+        false;
+
+
+      notify(
+        "Entered " +
+        currentVehicleData.name
       );
 
     }
 
 
     // ==================================================
-    // BUILDINGS
+    // EXIT VEHICLE
     // ==================================================
 
-    function createBuilding(
-      x,
-      z,
-      width,
-      depth,
-      height
-    ) {
+    function exitVehicle() {
 
-      const building =
-        new THREE.Group();
-
-
-      const body =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            width,
-            height,
-            depth
-          ),
-
-          new THREE.MeshStandardMaterial({
-            color: 0xb8b8b8
-          })
-        );
-
-
-      body.position.y =
-        height / 2;
-
-
-      body.castShadow =
-        true;
-
-
-      body.receiveShadow =
-        true;
-
-
-      building.add(
-        body
-      );
-
-
-      // --------------------------
-      // FRONT WINDOWS
-      // --------------------------
-
-      const windowMaterial =
-        new THREE.MeshStandardMaterial({
-          color: 0x72b7d9,
-          metalness: 0.2,
-          roughness: 0.2
-        });
-
-
-      for (
-        let y = 2;
-        y < height;
-        y += 3
+      if (
+        !currentVehicle
       ) {
 
-        for (
-          let wx =
-            -width / 2 + 2;
+        return;
 
-          wx <
-            width / 2;
+      }
 
-          wx += 4
+
+      player.visible =
+        true;
+
+
+      player.userData.inVehicle =
+        false;
+
+
+      player.userData.vehicle =
+        null;
+
+
+      inVehicle =
+        false;
+
+
+      player.position.x =
+        currentVehicle.position.x + 3;
+
+
+      player.position.z =
+        currentVehicle.position.z;
+
+
+      notify(
+        "Exited vehicle."
+      );
+
+    }
+
+
+    // ==================================================
+    // VEHICLE INTERACTION
+    // ==================================================
+
+    function handleVehicleInteraction() {
+
+      if (
+        inVehicle
+      ) {
+
+        exitVehicle();
+
+        return;
+
+      }
+
+
+      if (
+        currentVehicle
+      ) {
+
+        const distance =
+          player.position.distanceTo(
+            currentVehicle.position
+          );
+
+
+        if (
+          distance < 5
         ) {
 
-          const window =
-            new THREE.Mesh(
-              new THREE.BoxGeometry(
-                1.5,
-                1.3,
-                0.08
-              ),
+          enterVehicle();
 
-              windowMaterial
-            );
+        }
+
+      }
+
+    }
 
 
-          window.position.set(
-            wx,
-            y,
-            depth / 2 + 0.05
+    // ==================================================
+    // UNIVERSAL E INTERACTION
+    // ==================================================
+
+    function handleInteraction() {
+
+      if (
+        vehicleMenu.style.display
+        === "block"
+      ) {
+
+        return;
+
+      }
+
+
+      // Vehicle
+
+      if (
+        currentVehicle
+      ) {
+
+        const distance =
+          player.position.distanceTo(
+            currentVehicle.position
           );
 
 
-          building.add(
-            window
-          );
+        if (
+          inVehicle
+        ) {
+
+          exitVehicle();
+
+          return;
+
+        }
+
+
+        if (
+          distance < 5
+        ) {
+
+          enterVehicle();
+
+          return;
 
         }
 
       }
 
 
-      // --------------------------
-      // BACK WINDOWS
-      // --------------------------
+      // Dealership
 
-      for (
-        let y = 2;
-        y < height;
-        y += 3
+      const dealershipDistance =
+        player.position.distanceTo(
+          dealership.position
+        );
+
+
+      if (
+        dealershipDistance < 12
       ) {
 
-        for (
-          let wx =
-            -width / 2 + 2;
+        openVehicleMenu();
 
-          wx <
-            width / 2;
-
-          wx += 4
-        ) {
-
-          const window =
-            new THREE.Mesh(
-              new THREE.BoxGeometry(
-                1.5,
-                1.3,
-                0.08
-              ),
-
-              windowMaterial
-            );
-
-
-          window.position.set(
-            wx,
-            y,
-            -depth / 2 - 0.05
-          );
-
-
-          building.add(
-            window
-          );
-
-        }
+        return;
 
       }
 
 
-      building.position.set(
-        x,
-        0,
-        z
-      );
-
-
-      scene.add(
-        building
+      notify(
+        "Nothing to interact with here."
       );
 
     }
 
 
     // ==================================================
-    // CITY
+    // WALKING
     // ==================================================
 
-    createBuilding(
-      -35,
-      -30,
-      20,
-      20,
-      15
-    );
-
-
-    createBuilding(
-      35,
-      -50,
-      25,
-      20,
-      20
-    );
-
-
-    createBuilding(
-      -35,
-      30,
-      18,
-      25,
-      12
-    );
-
-
-    createBuilding(
-      35,
-      40,
-      25,
-      20,
-      18
-    );
-
-
-    // ==================================================
-    // INTERACTION POINT
-    // ==================================================
-
-    const interactionPoint =
-      new THREE.Vector3(
-        0,
-        0,
-        0
-      );
-
-
-    // ==================================================
-    // CLOCK
-    // ==================================================
-
-    const clock =
-      new THREE.Clock();
-
-
-    // ==================================================
-    // CAMERA CALCULATION
-    // ==================================================
-
-    function updateCamera(
-      delta
-    ) {
-
-      const target =
-        new THREE.Vector3(
-          player.position.x,
-          player.position.y + 1.5,
-          player.position.z
-        );
-
-
-      const horizontalDistance =
-        Math.cos(
-          cameraPitch
-        ) *
-        cameraDistance;
-
-
-      const verticalDistance =
-        Math.sin(
-          cameraPitch
-        ) *
-        cameraDistance;
-
-
-      const cameraX =
-        target.x -
-        Math.sin(cameraYaw) *
-        horizontalDistance;
-
-
-      const cameraZ =
-        target.z -
-        Math.cos(cameraYaw) *
-        horizontalDistance;
-
-
-      const desiredPosition =
-        new THREE.Vector3(
-          cameraX,
-          target.y + cameraHeight + verticalDistance,
-          cameraZ
-        );
-
-
-      const smoothing =
-        1 -
-        Math.pow(
-          0.001,
-          delta
-        );
-
-
-      camera.position.lerp(
-        desiredPosition,
-        smoothing
-      );
-
-
-      camera.lookAt(
-        target
-      );
-
-    }
-
-
-    // ==================================================
-    // PLAYER MOVEMENT
-    // ==================================================
-
-    function updatePlayer(
+    function updateWalking(
       delta
     ) {
 
@@ -1007,7 +2273,8 @@
         keys["w"]
       ) {
 
-        forward += 1;
+        forward +=
+          1;
 
       }
 
@@ -1016,7 +2283,8 @@
         keys["s"]
       ) {
 
-        forward -= 1;
+        forward -=
+          1;
 
       }
 
@@ -1025,7 +2293,8 @@
         keys["d"]
       ) {
 
-        sideways += 1;
+        sideways +=
+          1;
 
       }
 
@@ -1034,18 +2303,15 @@
         keys["a"]
       ) {
 
-        sideways -= 1;
+        sideways -=
+          1;
 
       }
 
 
-      const moving =
-        forward !== 0 ||
-        sideways !== 0;
-
-
       if (
-        !moving
+        forward === 0 &&
+        sideways === 0
       ) {
 
         player.userData.sprinting =
@@ -1055,8 +2321,6 @@
 
       }
 
-
-      // Sprint
 
       let speed =
         6;
@@ -1080,8 +2344,6 @@
       }
 
 
-      // Normalize diagonal movement
-
       const length =
         Math.sqrt(
           forward * forward +
@@ -1096,8 +2358,6 @@
       sideways /=
         length;
 
-
-      // Camera-relative movement
 
       const forwardX =
         Math.sin(
@@ -1124,43 +2384,30 @@
 
 
       const moveX =
-        (
-          forwardX *
-          forward
-        ) +
-        (
-          rightX *
-          sideways
-        );
+        forwardX *
+        forward +
+        rightX *
+        sideways;
 
 
       const moveZ =
-        (
-          forwardZ *
-          forward
-        ) +
-        (
-          rightZ *
-          sideways
-        );
-
-
-      const movement =
-        speed *
-        delta;
+        forwardZ *
+        forward +
+        rightZ *
+        sideways;
 
 
       player.position.x +=
         moveX *
-        movement;
+        speed *
+        delta;
 
 
       player.position.z +=
         moveZ *
-        movement;
+        speed *
+        delta;
 
-
-      // Character faces movement direction
 
       const targetRotation =
         Math.atan2(
@@ -1169,24 +2416,24 @@
         );
 
 
-      let rotationDifference =
+      let difference =
         targetRotation -
         player.rotation.y;
 
 
-      rotationDifference =
+      difference =
         Math.atan2(
           Math.sin(
-            rotationDifference
+            difference
           ),
           Math.cos(
-            rotationDifference
+            difference
           )
         );
 
 
       player.rotation.y +=
-        rotationDifference *
+        difference *
         Math.min(
           1,
           delta * 12
@@ -1196,8 +2443,457 @@
 
 
     // ==================================================
+    // DRIVING
+    // ==================================================
+
+    function updateDriving(
+      delta
+    ) {
+
+      if (
+        !currentVehicle
+      ) {
+
+        return;
+
+      }
+
+
+      let acceleration =
+        0;
+
+
+      if (
+        keys["w"]
+      ) {
+
+        acceleration =
+          1;
+
+      }
+
+
+      if (
+        keys["s"]
+      ) {
+
+        acceleration =
+          -1;
+
+      }
+
+
+      const vehicleData =
+        currentVehicle.userData;
+
+
+      if (
+        acceleration !== 0
+      ) {
+
+        vehicleData.speed +=
+          acceleration *
+          vehicleData.acceleration *
+          delta;
+
+      } else {
+
+        if (
+          vehicleData.speed > 0
+        ) {
+
+          vehicleData.speed -=
+            vehicleData.braking *
+            delta;
+
+        }
+
+
+        if (
+          vehicleData.speed < 0
+        ) {
+
+          vehicleData.speed +=
+            vehicleData.braking *
+            delta;
+
+        }
+
+      }
+
+
+      // Shift boost
+
+      let maxSpeed =
+        vehicleData.maxSpeed;
+
+
+      if (
+        keys["shift"]
+      ) {
+
+        maxSpeed *=
+          1.5;
+
+      }
+
+
+      vehicleData.speed =
+        THREE.MathUtils.clamp(
+          vehicleData.speed,
+          -maxSpeed / 2,
+          maxSpeed
+        );
+
+
+      // Steering
+
+      let steering =
+        0;
+
+
+      if (
+        keys["a"]
+      ) {
+
+        steering =
+          1;
+
+      }
+
+
+      if (
+        keys["d"]
+      ) {
+
+        steering =
+          -1;
+
+      }
+
+
+      if (
+        Math.abs(
+          vehicleData.speed
+        ) > 0.2
+      ) {
+
+        currentVehicle.rotation.y +=
+          steering *
+          vehicleData.steering *
+          delta *
+          (
+            vehicleData.speed /
+            maxSpeed
+          );
+
+      }
+
+
+      // Move vehicle
+
+      currentVehicle.translateZ(
+        vehicleData.speed *
+        delta
+      );
+
+
+      // Keep player with vehicle
+
+      player.position.copy(
+        currentVehicle.position
+      );
+
+
+      player.position.y =
+        0;
+
+
+      player.rotation.y =
+        currentVehicle.rotation.y;
+
+    }
+
+
+    // ==================================================
+    // CAMERA
+    // ==================================================
+
+    function updateCamera(
+      delta
+    ) {
+
+      let target;
+
+
+      if (
+        inVehicle &&
+        currentVehicle
+      ) {
+
+        target =
+          new THREE.Vector3(
+            currentVehicle.position.x,
+            1.6,
+            currentVehicle.position.z
+          );
+
+      } else {
+
+        target =
+          new THREE.Vector3(
+            player.position.x,
+            player.position.y + 1.5,
+            player.position.z
+          );
+
+      }
+
+
+      const distance =
+        inVehicle
+          ? 11
+          : 9;
+
+
+      const horizontal =
+        Math.cos(
+          cameraPitch
+        ) *
+        distance;
+
+
+      const vertical =
+        Math.sin(
+          cameraPitch
+        ) *
+        distance;
+
+
+      const cameraX =
+        target.x -
+        Math.sin(
+          cameraYaw
+        ) *
+        horizontal;
+
+
+      const cameraZ =
+        target.z -
+        Math.cos(
+          cameraYaw
+        ) *
+        horizontal;
+
+
+      const desired =
+        new THREE.Vector3(
+          cameraX,
+          target.y +
+          3.2 +
+          vertical,
+          cameraZ
+        );
+
+
+      const smoothing =
+        1 -
+        Math.pow(
+          0.001,
+          delta
+        );
+
+
+      camera.position.lerp(
+        desired,
+        smoothing
+      );
+
+
+      camera.lookAt(
+        target
+      );
+
+    }
+
+
+    // ==================================================
+    // INTERACTION DETECTION
+    // ==================================================
+
+    function updateInteraction() {
+
+      const interaction =
+        document.getElementById(
+          "interaction"
+        );
+
+
+      // Vehicle
+
+      if (
+        currentVehicle
+      ) {
+
+        if (
+          inVehicle
+        ) {
+
+          nearbyInteraction =
+            "Exit Vehicle";
+
+          interaction.style.display =
+            "block";
+
+          document.getElementById(
+            "interactionText"
+          ).textContent =
+            nearbyInteraction;
+
+          return;
+
+        }
+
+
+        const vehicleDistance =
+          player.position.distanceTo(
+            currentVehicle.position
+          );
+
+
+        if (
+          vehicleDistance < 5
+        ) {
+
+          nearbyInteraction =
+            "Enter Vehicle";
+
+          interaction.style.display =
+            "block";
+
+          document.getElementById(
+            "interactionText"
+          ).textContent =
+            nearbyInteraction;
+
+          return;
+
+        }
+
+      }
+
+
+      // Dealership
+
+      const dealershipDistance =
+        player.position.distanceTo(
+          dealership.position
+        );
+
+
+      if (
+        dealershipDistance < 12
+      ) {
+
+        nearbyInteraction =
+          "Open Dealership";
+
+        interaction.style.display =
+          "block";
+
+        document.getElementById(
+          "interactionText"
+        ).textContent =
+          nearbyInteraction;
+
+        return;
+
+      }
+
+
+      nearbyInteraction =
+        null;
+
+
+      interaction.style.display =
+        "none";
+
+    }
+
+
+    // ==================================================
+    // HUD
+    // ==================================================
+
+    function updateHUD() {
+
+      document.getElementById(
+        "job"
+      ).textContent =
+        player.userData.job;
+
+
+      document.getElementById(
+        "money"
+      ).textContent =
+        "£" +
+        player.userData.money.toLocaleString();
+
+
+      document.getElementById(
+        "xp"
+      ).textContent =
+        player.userData.xp;
+
+    }
+
+
+    // ==================================================
+    // WANTED
+    // ==================================================
+
+    function updateWanted() {
+
+      const wanted =
+        document.getElementById(
+          "wanted"
+        );
+
+
+      const level =
+        player.userData.wantedLevel;
+
+
+      if (
+        level > 0
+      ) {
+
+        wanted.style.display =
+          "block";
+
+
+        document.getElementById(
+          "wantedLevel"
+        ).textContent =
+          level;
+
+      } else {
+
+        wanted.style.display =
+          "none";
+
+      }
+
+    }
+
+
+    // ==================================================
     // GAME LOOP
     // ==================================================
+
+    const clock =
+      new THREE.Clock();
+
 
     function animate() {
 
@@ -1213,9 +2909,21 @@
         );
 
 
-      updatePlayer(
-        delta
-      );
+      if (
+        inVehicle
+      ) {
+
+        updateDriving(
+          delta
+        );
+
+      } else {
+
+        updateWalking(
+          delta
+        );
+
+      }
 
 
       updateCamera(
@@ -1223,112 +2931,14 @@
       );
 
 
-      // ==================================================
-      // INTERACTION RANGE
-      // ==================================================
-
-      const distance =
-        player.position.distanceTo(
-          interactionPoint
-        );
+      updateInteraction();
 
 
-      const interaction =
-        document.getElementById(
-          "interaction"
-        );
+      updateHUD();
 
 
-      if (
-        distance < 8
-      ) {
+      updateWanted();
 
-        nearbyInteraction =
-          "Open City Interaction";
-
-
-        interaction.style.display =
-          "block";
-
-
-        document.getElementById(
-          "interactionText"
-        ).textContent =
-          nearbyInteraction;
-
-      } else {
-
-        nearbyInteraction =
-          null;
-
-
-        interaction.style.display =
-          "none";
-
-      }
-
-
-      // ==================================================
-      // HUD
-      // ==================================================
-
-      document.getElementById(
-        "job"
-      ).textContent =
-        player.userData.job;
-
-
-      document.getElementById(
-        "money"
-      ).textContent =
-        "£" +
-        player.userData.money;
-
-
-      document.getElementById(
-        "xp"
-      ).textContent =
-        player.userData.xp;
-
-
-      // ==================================================
-      // WANTED
-      // ==================================================
-
-      const wanted =
-        document.getElementById(
-          "wanted"
-        );
-
-
-      const wantedLevel =
-        player.userData.wantedLevel;
-
-
-      if (
-        wantedLevel > 0
-      ) {
-
-        wanted.style.display =
-          "block";
-
-
-        document.getElementById(
-          "wantedLevel"
-        ).textContent =
-          wantedLevel;
-
-      } else {
-
-        wanted.style.display =
-          "none";
-
-      }
-
-
-      // ==================================================
-      // RENDER
-      // ==================================================
 
       renderer.render(
         scene,
@@ -1342,7 +2952,7 @@
 
 
     // ==================================================
-    // WINDOW RESIZE
+    // RESIZE
     // ==================================================
 
     window.addEventListener(
@@ -1368,4 +2978,5 @@
   </script>
 
 </body>
+
 </html>
