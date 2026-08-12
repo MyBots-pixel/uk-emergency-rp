@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>UK Emergency RP</title>
 
   <style>
@@ -10,11 +11,14 @@
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
       background: #111;
-      font-family: Arial, sans-serif;
     }
 
     #game {
@@ -22,113 +26,346 @@
       height: 100vh;
     }
 
+    canvas {
+      display: block;
+    }
+
+    /* =========================
+       INTERACTION
+    ========================= */
+
     #interaction {
       position: fixed;
       left: 50%;
       bottom: 80px;
       transform: translateX(-50%);
-      background: rgba(10, 15, 25, 0.9);
-      color: white;
-      padding: 12px 20px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.2);
+
       display: none;
-      font-size: 16px;
-    }
 
-    #interaction span {
-      background: white;
-      color: black;
-      padding: 4px 8px;
-      border-radius: 5px;
-      font-weight: bold;
-      margin-right: 8px;
-    }
+      padding: 12px 20px;
 
-    #crosshair {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
       color: white;
-      font-size: 20px;
+      background: rgba(10, 15, 25, 0.92);
+
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+
+      font-size: 16px;
+
+      box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.35);
+
       pointer-events: none;
     }
 
+    #interaction span {
+      display: inline-block;
+
+      margin-right: 8px;
+      padding: 5px 9px;
+
+      color: #111;
+      background: white;
+
+      border-radius: 6px;
+
+      font-weight: 800;
+    }
+
+
+    /* =========================
+       CROSSHAIR
+    ========================= */
+
+    #crosshair {
+      position: fixed;
+
+      left: 50%;
+      top: 50%;
+
+      transform: translate(-50%, -50%);
+
+      color: white;
+
+      font-size: 20px;
+      font-weight: bold;
+
+      pointer-events: none;
+
+      text-shadow:
+        0 1px 3px black;
+    }
+
+
+    /* =========================
+       CONTROLS
+    ========================= */
+
     #controls {
       position: fixed;
+
       left: 20px;
       bottom: 20px;
-      color: white;
-      background: rgba(0,0,0,0.55);
+
       padding: 12px 16px;
+
+      color: white;
+
+      background: rgba(0, 0, 0, 0.6);
+
       border-radius: 10px;
+
       font-size: 13px;
+
+      line-height: 1.7;
+
+      pointer-events: none;
+    }
+
+
+    /* =========================
+       TOP HUD
+    ========================= */
+
+    #hud {
+      position: fixed;
+
+      top: 20px;
+      left: 20px;
+
+      min-width: 220px;
+
+      padding: 14px 16px;
+
+      color: white;
+
+      background: rgba(10, 15, 25, 0.82);
+
+      border: 1px solid rgba(255, 255, 255, 0.12);
+
+      border-radius: 12px;
+
+      box-shadow:
+        0 8px 30px rgba(0, 0, 0, 0.25);
+
+      pointer-events: none;
+    }
+
+    #hudTitle {
+      margin-bottom: 8px;
+
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .hudRow {
+      display: flex;
+      justify-content: space-between;
+
+      gap: 25px;
+
+      margin-top: 4px;
+
+      font-size: 13px;
+    }
+
+    .hudValue {
+      font-weight: 700;
+    }
+
+
+    /* =========================
+       WANTED
+    ========================= */
+
+    #wanted {
+      display: none;
+
+      position: fixed;
+
+      top: 20px;
+      right: 20px;
+
+      padding: 12px 16px;
+
+      color: white;
+
+      background: rgba(120, 0, 0, 0.85);
+
+      border: 1px solid rgba(255, 255, 255, 0.15);
+
+      border-radius: 10px;
+
+      font-weight: 700;
     }
   </style>
 </head>
 
 <body>
 
+  <!-- GAME -->
   <div id="game"></div>
 
-  <div id="crosshair">+</div>
+
+  <!-- HUD -->
+
+  <div id="hud">
+
+    <div id="hudTitle">
+      UK Emergency RP
+    </div>
+
+    <div class="hudRow">
+      <span>Job</span>
+      <span
+        id="job"
+        class="hudValue"
+      >
+        Civilian
+      </span>
+    </div>
+
+    <div class="hudRow">
+      <span>Money</span>
+      <span
+        id="money"
+        class="hudValue"
+      >
+        £500
+      </span>
+    </div>
+
+    <div class="hudRow">
+      <span>XP</span>
+      <span
+        id="xp"
+        class="hudValue"
+      >
+        0
+      </span>
+    </div>
+
+  </div>
+
+
+  <!-- WANTED -->
+
+  <div id="wanted">
+    🚨 WANTED
+    <span id="wantedLevel">0</span>
+  </div>
+
+
+  <!-- CROSSHAIR -->
+
+  <div id="crosshair">
+    +
+  </div>
+
+
+  <!-- INTERACTION -->
 
   <div id="interaction">
+
     <span>E</span>
-    <b id="interactionText">Interact</b>
+
+    <b id="interactionText">
+      Interact
+    </b>
+
   </div>
 
+
+  <!-- CONTROLS -->
+
   <div id="controls">
-    <b>WASD</b> Move<br>
+
+    <b>W A S D</b> Move<br>
     <b>SHIFT</b> Sprint<br>
     <b>E</b> Interact
+
   </div>
+
+
+  <!-- =========================
+       GAME SCRIPT
+  ========================= -->
 
   <script type="module">
 
     import * as THREE from
       "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-    // -------------------------
+    import { createPlayer } from "./player.js";
+
+
+    // =========================
     // GAME SETUP
-    // -------------------------
+    // =========================
 
-    const game = document.getElementById("game");
+    const game =
+      document.getElementById("game");
 
-    const scene = new THREE.Scene();
 
-    scene.background = new THREE.Color(0x87ceeb);
+    const scene =
+      new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(
-      70,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true
-    });
+    scene.background =
+      new THREE.Color(
+        0x87ceeb
+      );
+
+
+    const camera =
+      new THREE.PerspectiveCamera(
+        70,
+        window.innerWidth /
+        window.innerHeight,
+        0.1,
+        1000
+      );
+
+
+    const renderer =
+      new THREE.WebGLRenderer({
+        antialias: true
+      });
+
 
     renderer.setSize(
       window.innerWidth,
       window.innerHeight
     );
 
-    renderer.shadowMap.enabled = true;
 
-    game.appendChild(renderer.domElement);
-
-
-    // -------------------------
-    // LIGHTING
-    // -------------------------
-
-    const sunlight = new THREE.DirectionalLight(
-      0xffffff,
-      2
+    renderer.setPixelRatio(
+      Math.min(
+        window.devicePixelRatio,
+        2
+      )
     );
+
+
+    renderer.shadowMap.enabled =
+      true;
+
+
+    game.appendChild(
+      renderer.domElement
+    );
+
+
+    // =========================
+    // LIGHTING
+    // =========================
+
+    const sunlight =
+      new THREE.DirectionalLight(
+        0xffffff,
+        2
+      );
+
 
     sunlight.position.set(
       50,
@@ -136,22 +373,31 @@
       50
     );
 
-    sunlight.castShadow = true;
 
-    scene.add(sunlight);
+    sunlight.castShadow =
+      true;
 
 
-    const ambient = new THREE.AmbientLight(
-      0xffffff,
-      0.6
+    scene.add(
+      sunlight
     );
 
-    scene.add(ambient);
+
+    const ambient =
+      new THREE.AmbientLight(
+        0xffffff,
+        0.6
+      );
 
 
-    // -------------------------
+    scene.add(
+      ambient
+    );
+
+
+    // =========================
     // GROUND
-    // -------------------------
+    // =========================
 
     const groundGeometry =
       new THREE.PlaneGeometry(
@@ -159,10 +405,12 @@
         500
       );
 
+
     const groundMaterial =
       new THREE.MeshStandardMaterial({
         color: 0x3b7d3b
       });
+
 
     const ground =
       new THREE.Mesh(
@@ -170,17 +418,23 @@
         groundMaterial
       );
 
+
     ground.rotation.x =
       -Math.PI / 2;
 
-    ground.receiveShadow = true;
 
-    scene.add(ground);
+    ground.receiveShadow =
+      true;
 
 
-    // -------------------------
-    // ROAD
-    // -------------------------
+    scene.add(
+      ground
+    );
+
+
+    // =========================
+    // MAIN ROAD
+    // =========================
 
     const roadGeometry =
       new THREE.BoxGeometry(
@@ -189,10 +443,12 @@
         500
       );
 
+
     const roadMaterial =
       new THREE.MeshStandardMaterial({
         color: 0x333333
       });
+
 
     const road =
       new THREE.Mesh(
@@ -200,58 +456,63 @@
         roadMaterial
       );
 
-    road.position.y = 0.05;
 
-    scene.add(road);
+    road.position.y =
+      0.05;
 
 
-    // -------------------------
+    scene.add(
+      road
+    );
+
+
+    // =========================
+    // ROAD MARKINGS
+    // =========================
+
+    const lineMaterial =
+      new THREE.MeshStandardMaterial({
+        color: 0xffffff
+      });
+
+
+    for (
+      let z = -240;
+      z < 240;
+      z += 10
+    ) {
+
+      const line =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.25,
+            0.03,
+            5
+          ),
+          lineMaterial
+        );
+
+
+      line.position.set(
+        0,
+        0.12,
+        z
+      );
+
+
+      scene.add(
+        line
+      );
+
+    }
+
+
+    // =========================
     // PLAYER
-    // -------------------------
+    // =========================
 
     const player =
-      new THREE.Group();
-
-    // Body
-
-    const body =
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          1,
-          1.5,
-          0.6
-        ),
-        new THREE.MeshStandardMaterial({
-          color: 0x2563eb
-        })
-      );
-
-    body.position.y = 1.5;
-
-    body.castShadow = true;
-
-    player.add(body);
-
-
-    // Head
-
-    const head =
-      new THREE.Mesh(
-        new THREE.SphereGeometry(
-          0.4,
-          16,
-          16
-        ),
-        new THREE.MeshStandardMaterial({
-          color: 0xffc9a5
-        })
-      );
-
-    head.position.y = 2.55;
-
-    head.castShadow = true;
-
-    player.add(head);
+      createPlayer();
 
 
     player.position.set(
@@ -260,36 +521,48 @@
       10
     );
 
-    scene.add(player);
+
+    scene.add(
+      player
+    );
 
 
-    // -------------------------
+    // =========================
     // CAMERA
-    // -------------------------
+    // =========================
 
     camera.position.set(
       0,
       5,
-      12
+      14
     );
 
 
-    // -------------------------
-    // CONTROLS
-    // -------------------------
+    // =========================
+    // KEYBOARD
+    // =========================
 
     const keys = {};
+
 
     window.addEventListener(
       "keydown",
       event => {
 
-        keys[event.key.toLowerCase()] = true;
+        keys[
+          event.key.toLowerCase()
+        ] = true;
+
+
+        // Universal interaction
 
         if (
-          event.key.toLowerCase() === "e"
+          event.key.toLowerCase()
+          === "e"
         ) {
+
           interact();
+
         }
 
       }
@@ -300,28 +573,57 @@
       "keyup",
       event => {
 
-        keys[event.key.toLowerCase()] =
-          false;
+        keys[
+          event.key.toLowerCase()
+        ] = false;
 
       }
     );
 
 
-    // -------------------------
+    // =========================
     // INTERACTION
-    // -------------------------
+    // =========================
 
-    let nearbyInteraction = null;
+    let nearbyInteraction =
+      null;
+
 
     function interact() {
 
-      if (!nearbyInteraction)
+      if (
+        !nearbyInteraction
+      ) {
+
         return;
+
+      }
+
 
       console.log(
         "Interaction:",
         nearbyInteraction
       );
+
+
+      /*
+        Later this will open
+        actual menus.
+
+        Examples:
+
+        Vehicle dealership
+        Enter vehicle
+        Police job
+        Fire job
+        Ambulance job
+        HEMS job
+        Doors
+        Shops
+        Garages
+        Admin interactions
+      */
+
 
       alert(
         nearbyInteraction
@@ -330,9 +632,9 @@
     }
 
 
-    // -------------------------
-    // BUILDING
-    // -------------------------
+    // =========================
+    // BUILDINGS
+    // =========================
 
     function createBuilding(
       x,
@@ -346,6 +648,8 @@
         new THREE.Group();
 
 
+      // Building body
+
       const body =
         new THREE.Mesh(
           new THREE.BoxGeometry(
@@ -358,15 +662,27 @@
           })
         );
 
+
       body.position.y =
         height / 2;
 
-      body.castShadow = true;
 
-      building.add(body);
+      body.castShadow =
+        true;
 
 
-      // Windows
+      body.receiveShadow =
+        true;
+
+
+      building.add(
+        body
+      );
+
+
+      // =========================
+      // WINDOWS
+      // =========================
 
       const windowMaterial =
         new THREE.MeshStandardMaterial({
@@ -383,8 +699,12 @@
       ) {
 
         for (
-          let wx = -width / 2 + 2;
-          wx < width / 2;
+          let wx =
+            -width / 2 + 2;
+
+          wx <
+            width / 2;
+
           wx += 4
         ) {
 
@@ -398,13 +718,62 @@
               windowMaterial
             );
 
+
           window.position.set(
             wx,
             y,
             depth / 2 + 0.05
           );
 
-          building.add(window);
+
+          building.add(
+            window
+          );
+
+        }
+
+      }
+
+
+      // Back windows
+
+      for (
+        let y = 2;
+        y < height;
+        y += 3
+      ) {
+
+        for (
+          let wx =
+            -width / 2 + 2;
+
+          wx <
+            width / 2;
+
+          wx += 4
+        ) {
+
+          const window =
+            new THREE.Mesh(
+              new THREE.BoxGeometry(
+                1.5,
+                1.3,
+                0.08
+              ),
+              windowMaterial
+            );
+
+
+          window.position.set(
+            wx,
+            y,
+            -depth / 2 - 0.05
+          );
+
+
+          building.add(
+            window
+          );
 
         }
 
@@ -417,14 +786,17 @@
         z
       );
 
-      scene.add(building);
+
+      scene.add(
+        building
+      );
 
     }
 
 
-    // -------------------------
-    // CITY
-    // -------------------------
+    // =========================
+    // CITY BUILDINGS
+    // =========================
 
     createBuilding(
       -35,
@@ -434,6 +806,7 @@
       15
     );
 
+
     createBuilding(
       35,
       -50,
@@ -442,6 +815,7 @@
       20
     );
 
+
     createBuilding(
       -35,
       30,
@@ -449,6 +823,7 @@
       25,
       12
     );
+
 
     createBuilding(
       35,
@@ -459,13 +834,29 @@
     );
 
 
-    // -------------------------
-    // GAME LOOP
-    // -------------------------
+    // =========================
+    // INTERACTION POINT
+    // =========================
+
+    const interactionPoint =
+      new THREE.Vector3(
+        0,
+        0,
+        0
+      );
+
+
+    // =========================
+    // GAME CLOCK
+    // =========================
 
     const clock =
       new THREE.Clock();
 
+
+    // =========================
+    // GAME LOOP
+    // =========================
 
     function animate() {
 
@@ -473,57 +864,115 @@
         animate
       );
 
+
       const delta =
         clock.getDelta();
 
 
+      // =========================
+      // MOVEMENT
+      // =========================
+
       let speed = 6;
 
-      if (keys["shift"])
+
+      if (
+        keys["shift"]
+      ) {
+
         speed = 11;
+
+        player.userData.sprinting =
+          true;
+
+      } else {
+
+        player.userData.sprinting =
+          false;
+
+      }
 
 
       const movement =
         speed * delta;
 
 
-      if (keys["w"])
-        player.position.z -= movement;
+      if (
+        keys["w"]
+      ) {
 
-      if (keys["s"])
-        player.position.z += movement;
+        player.position.z -=
+          movement;
 
-      if (keys["a"])
-        player.position.x -= movement;
-
-      if (keys["d"])
-        player.position.x += movement;
+      }
 
 
-      // Camera follows player
+      if (
+        keys["s"]
+      ) {
+
+        player.position.z +=
+          movement;
+
+      }
+
+
+      if (
+        keys["a"]
+      ) {
+
+        player.position.x -=
+          movement;
+
+      }
+
+
+      if (
+        keys["d"]
+      ) {
+
+        player.position.x +=
+          movement;
+
+      }
+
+
+      // =========================
+      // CAMERA FOLLOW
+      // =========================
+
+      const cameraTarget =
+        new THREE.Vector3(
+          player.position.x,
+          1.5,
+          player.position.z
+        );
+
 
       camera.position.x =
         player.position.x;
 
+
       camera.position.z =
         player.position.z + 12;
 
+
+      camera.position.y =
+        5;
+
+
       camera.lookAt(
-        player.position.x,
-        1.5,
-        player.position.z
+        cameraTarget
       );
 
 
-      // Example interaction zone
+      // =========================
+      // INTERACTION RANGE
+      // =========================
 
       const distance =
         player.position.distanceTo(
-          new THREE.Vector3(
-            0,
-            0,
-            0
-          )
+          interactionPoint
         );
 
 
@@ -533,13 +982,17 @@
         );
 
 
-      if (distance < 8) {
+      if (
+        distance < 8
+      ) {
 
         nearbyInteraction =
           "Open City Interaction";
 
+
         interaction.style.display =
           "block";
+
 
         document.getElementById(
           "interactionText"
@@ -548,13 +1001,77 @@
 
       } else {
 
-        nearbyInteraction = null;
+        nearbyInteraction =
+          null;
+
 
         interaction.style.display =
           "none";
 
       }
 
+
+      // =========================
+      // UPDATE HUD
+      // =========================
+
+      document.getElementById(
+        "job"
+      ).textContent =
+        player.userData.job;
+
+
+      document.getElementById(
+        "money"
+      ).textContent =
+        "£" +
+        player.userData.money;
+
+
+      document.getElementById(
+        "xp"
+      ).textContent =
+        player.userData.xp;
+
+
+      // =========================
+      // WANTED SYSTEM
+      // =========================
+
+      const wanted =
+        document.getElementById(
+          "wanted"
+        );
+
+
+      const wantedLevel =
+        player.userData.wantedLevel;
+
+
+      if (
+        wantedLevel > 0
+      ) {
+
+        wanted.style.display =
+          "block";
+
+
+        document.getElementById(
+          "wantedLevel"
+        ).textContent =
+          wantedLevel;
+
+      } else {
+
+        wanted.style.display =
+          "none";
+
+      }
+
+
+      // =========================
+      // RENDER
+      // =========================
 
       renderer.render(
         scene,
@@ -567,9 +1084,9 @@
     animate();
 
 
-    // -------------------------
+    // =========================
     // RESIZE
-    // -------------------------
+    // =========================
 
     window.addEventListener(
       "resize",
@@ -579,7 +1096,9 @@
           window.innerWidth /
           window.innerHeight;
 
+
         camera.updateProjectionMatrix();
+
 
         renderer.setSize(
           window.innerWidth,
