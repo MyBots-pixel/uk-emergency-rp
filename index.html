@@ -1,897 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>UK Emergency RP</title>
 
-
   <style>
-
     * {
       box-sizing: border-box;
     }
 
-
     html,
     body {
-
       margin: 0;
-
       width: 100%;
       height: 100%;
-
       overflow: hidden;
-
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-      background: #111;
-
+      font-family: Arial, Helvetica, sans-serif;
+      background: #87ceeb;
     }
-
 
     #game {
-
       width: 100vw;
       height: 100vh;
-
     }
-
 
     canvas {
-
       display: block;
-
     }
-
-
-    /* =========================
-       INTERACTION
-    ========================= */
-
-    #interaction {
-
-      position: fixed;
-
-      left: 50%;
-      bottom: 80px;
-
-      transform:
-        translateX(-50%);
-
-      display: none;
-
-      padding:
-        12px 20px;
-
-      color: white;
-
-      background:
-        rgba(
-          10,
-          15,
-          25,
-          0.92
-        );
-
-      border:
-        1px solid
-        rgba(
-          255,
-          255,
-          255,
-          0.2
-        );
-
-      border-radius:
-        10px;
-
-      font-size:
-        16px;
-
-      box-shadow:
-        0 8px 30px
-        rgba(
-          0,
-          0,
-          0,
-          0.35
-        );
-
-      pointer-events:
-        none;
-
-    }
-
-
-    #interaction span {
-
-      display:
-        inline-block;
-
-      margin-right:
-        8px;
-
-      padding:
-        5px 9px;
-
-      color:
-        #111;
-
-      background:
-        white;
-
-      border-radius:
-        6px;
-
-      font-weight:
-        800;
-
-    }
-
-
-    /* =========================
-       CROSSHAIR
-    ========================= */
-
-    #crosshair {
-
-      position:
-        fixed;
-
-      left:
-        50%;
-
-      top:
-        50%;
-
-      transform:
-        translate(
-          -50%,
-          -50%
-        );
-
-      color:
-        white;
-
-      font-size:
-        20px;
-
-      font-weight:
-        bold;
-
-      pointer-events:
-        none;
-
-      text-shadow:
-        0 1px 3px black;
-
-    }
-
-
-    /* =========================
-       CONTROLS
-    ========================= */
-
-    #controls {
-
-      position:
-        fixed;
-
-      left:
-        20px;
-
-      bottom:
-        20px;
-
-      padding:
-        12px 16px;
-
-      color:
-        white;
-
-      background:
-        rgba(
-          0,
-          0,
-          0,
-          0.6
-        );
-
-      border-radius:
-        10px;
-
-      font-size:
-        13px;
-
-      line-height:
-        1.7;
-
-      pointer-events:
-        none;
-
-    }
-
-
-    /* =========================
-       HUD
-    ========================= */
 
     #hud {
-
-      position:
-        fixed;
-
-      top:
-        20px;
-
-      left:
-        20px;
-
-      min-width:
-        220px;
-
-      padding:
-        14px 16px;
-
-      color:
-        white;
-
-      background:
-        rgba(
-          10,
-          15,
-          25,
-          0.82
-        );
-
-      border:
-        1px solid
-        rgba(
-          255,
-          255,
-          255,
-          0.12
-        );
-
-      border-radius:
-        12px;
-
-      box-shadow:
-        0 8px 30px
-        rgba(
-          0,
-          0,
-          0,
-          0.25
-        );
-
-      pointer-events:
-        none;
-
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      min-width: 230px;
+      padding: 15px;
+      color: white;
+      background: rgba(10, 15, 25, 0.85);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      z-index: 5;
+      pointer-events: none;
     }
-
 
     #hudTitle {
-
-      margin-bottom:
-        8px;
-
-      font-size:
-        18px;
-
-      font-weight:
-        800;
-
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 9px;
     }
-
 
     .hudRow {
-
-      display:
-        flex;
-
-      justify-content:
-        space-between;
-
-      gap:
-        25px;
-
-      margin-top:
-        4px;
-
-      font-size:
-        13px;
-
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+      font-size: 14px;
     }
-
 
     .hudValue {
-
-      font-weight:
-        700;
-
+      font-weight: 700;
     }
 
-
-    /* =========================
-       WANTED
-    ========================= */
-
-    #wanted {
-
-      display:
-        none;
-
-      position:
-        fixed;
-
-      top:
-        20px;
-
-      right:
-        20px;
-
-      padding:
-        12px 16px;
-
-      color:
-        white;
-
-      background:
-        rgba(
-          120,
-          0,
-          0,
-          0.85
-        );
-
-      border:
-        1px solid
-        rgba(
-          255,
-          255,
-          255,
-          0.15
-        );
-
-      border-radius:
-        10px;
-
-      font-weight:
-        700;
-
+    #controls {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      padding: 12px 16px;
+      color: white;
+      background: rgba(0,0,0,0.65);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.7;
+      z-index: 5;
+      pointer-events: none;
     }
-
-
-    /* =========================
-       MOUSE HINT
-    ========================= */
 
     #mouseHint {
-
-      position:
-        fixed;
-
-      right:
-        20px;
-
-      bottom:
-        20px;
-
-      padding:
-        10px 14px;
-
-      color:
-        white;
-
-      background:
-        rgba(
-          0,
-          0,
-          0,
-          0.55
-        );
-
-      border-radius:
-        9px;
-
-      font-size:
-        12px;
-
-      pointer-events:
-        none;
-
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      padding: 10px 14px;
+      color: white;
+      background: rgba(0,0,0,0.6);
+      border-radius: 9px;
+      font-size: 12px;
+      z-index: 5;
+      pointer-events: none;
     }
 
+    #interaction {
+      display: none;
+      position: fixed;
+      left: 50%;
+      bottom: 80px;
+      transform: translateX(-50%);
+      padding: 12px 20px;
+      color: white;
+      background: rgba(10,15,25,0.94);
+      border-radius: 10px;
+      z-index: 10;
+      pointer-events: none;
+    }
 
-    /* =========================
-       VEHICLE MENU
-    ========================= */
+    #interaction span {
+      display: inline-block;
+      margin-right: 8px;
+      padding: 5px 9px;
+      color: #111;
+      background: white;
+      border-radius: 6px;
+      font-weight: 800;
+    }
+
+    #crosshair {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      text-shadow: 0 1px 3px black;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    #wanted {
+      display: none;
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      padding: 12px 16px;
+      color: white;
+      background: rgba(150,0,0,0.9);
+      border-radius: 10px;
+      z-index: 5;
+      font-weight: 700;
+    }
 
     #vehicleMenu {
-
-      position:
-        fixed;
-
-      left:
-        50%;
-
-      top:
-        50%;
-
-      transform:
-        translate(
-          -50%,
-          -50%
-        );
-
-      width:
-        520px;
-
-      max-width:
-        90vw;
-
-      max-height:
-        75vh;
-
-      overflow-y:
-        auto;
-
-      padding:
-        24px;
-
-      color:
-        white;
-
-      background:
-        rgba(
-          10,
-          15,
-          25,
-          0.97
-        );
-
-      border:
-        1px solid
-        rgba(
-          255,
-          255,
-          255,
-          0.15
-        );
-
-      border-radius:
-        16px;
-
-      box-shadow:
-        0 20px 60px
-        rgba(
-          0,
-          0,
-          0,
-          0.55
-        );
-
-      display:
-        none;
-
-      z-index:
-        20;
-
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 520px;
+      max-width: 90vw;
+      max-height: 75vh;
+      overflow-y: auto;
+      padding: 24px;
+      color: white;
+      background: rgba(10,15,25,0.97);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      z-index: 20;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.55);
     }
-
 
     #vehicleMenu h2 {
-
-      margin-top:
-        0;
-
-      margin-bottom:
-        6px;
-
+      margin-top: 0;
     }
-
 
     #vehicleMenu p {
-
-      color:
-        #aab3c5;
-
-      font-size:
-        13px;
-
+      color: #aab3c5;
+      font-size: 13px;
     }
-
 
     .vehicleCard {
-
-      display:
-        flex;
-
-      align-items:
-        center;
-
-      justify-content:
-        space-between;
-
-      gap:
-        15px;
-
-      margin-top:
-        12px;
-
-      padding:
-        14px;
-
-      background:
-        rgba(
-          255,
-          255,
-          255,
-          0.06
-        );
-
-      border:
-        1px solid
-        rgba(
-          255,
-          255,
-          255,
-          0.08
-        );
-
-      border-radius:
-        10px;
-
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 12px;
+      padding: 14px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 10px;
     }
-
 
     .vehicleInfo strong {
-
-      display:
-        block;
-
-      margin-bottom:
-        4px;
-
+      display: block;
+      margin-bottom: 4px;
     }
-
 
     .vehicleInfo small {
-
-      color:
-        #aab3c5;
-
+      color: #aab3c5;
     }
-
 
     .vehicleButton {
-
-      border:
-        none;
-
-      padding:
-        9px 14px;
-
-      border-radius:
-        8px;
-
-      color:
-        white;
-
-      background:
-        #2563eb;
-
-      cursor:
-        pointer;
-
-      font-weight:
-        700;
-
+      border: none;
+      padding: 9px 14px;
+      border-radius: 8px;
+      color: white;
+      background: #2563eb;
+      cursor: pointer;
+      font-weight: 700;
     }
-
 
     .vehicleButton:hover {
-
-      background:
-        #1d4ed8;
-
+      background: #1d4ed8;
     }
-
 
     #closeVehicleMenu {
-
-      width:
-        100%;
-
-      margin-top:
-        18px;
-
-      padding:
-        11px;
-
-      border:
-        none;
-
-      border-radius:
-        9px;
-
-      color:
-        white;
-
-      background:
-        #333;
-
-      cursor:
-        pointer;
-
+      width: 100%;
+      margin-top: 18px;
+      padding: 11px;
+      border: none;
+      border-radius: 9px;
+      color: white;
+      background: #333;
+      cursor: pointer;
     }
-
-
-    /* =========================
-       NOTIFICATION
-    ========================= */
 
     #notification {
-
-      position:
-        fixed;
-
-      left:
-        50%;
-
-      top:
-        25px;
-
-      transform:
-        translateX(-50%);
-
-      padding:
-        12px 20px;
-
-      color:
-        white;
-
-      background:
-        rgba(
-          10,
-          15,
-          25,
-          0.95
-        );
-
-      border-radius:
-        10px;
-
-      display:
-        none;
-
-      z-index:
-        30;
-
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 25px;
+      transform: translateX(-50%);
+      padding: 12px 20px;
+      color: white;
+      background: rgba(10,15,25,0.95);
+      border-radius: 10px;
+      z-index: 30;
     }
-
   </style>
-
 </head>
-
 
 <body>
 
-
   <div id="game"></div>
 
-
-  <!-- HUD -->
-
   <div id="hud">
-
-    <div id="hudTitle">
-      UK Emergency RP
-    </div>
-
+    <div id="hudTitle">UK Emergency RP</div>
 
     <div class="hudRow">
-
-      <span>
-        Job
-      </span>
-
-      <span
-        id="job"
-        class="hudValue"
-      >
-        Civilian
-      </span>
-
+      <span>Job</span>
+      <span id="job" class="hudValue">Civilian</span>
     </div>
-
 
     <div class="hudRow">
-
-      <span>
-        Money
-      </span>
-
-      <span
-        id="money"
-        class="hudValue"
-      >
-        £500
-      </span>
-
+      <span>Money</span>
+      <span id="money" class="hudValue">£500</span>
     </div>
-
 
     <div class="hudRow">
-
-      <span>
-        XP
-      </span>
-
-      <span
-        id="xp"
-        class="hudValue"
-      >
-        0
-      </span>
-
+      <span>XP</span>
+      <span id="xp" class="hudValue">0</span>
     </div>
-
   </div>
-
-
-  <!-- WANTED -->
 
   <div id="wanted">
-
     🚨 WANTED
-
-    <span
-      id="wantedLevel"
-    >
-      0
-    </span>
-
+    <span id="wantedLevel">0</span>
   </div>
 
-
-  <!-- CROSSHAIR -->
-
-  <div id="crosshair">
-    +
-  </div>
-
-
-  <!-- INTERACTION -->
+  <div id="crosshair">+</div>
 
   <div id="interaction">
-
-    <span>
-      E
-    </span>
-
-    <b id="interactionText">
-      Interact
-    </b>
-
+    <span>E</span>
+    <b id="interactionText">Interact</b>
   </div>
-
-
-  <!-- CONTROLS -->
 
   <div id="controls">
-
-    <b>W A S D</b>
-    Move / Drive
-
-    <br>
-
-    <b>SHIFT</b>
-    Sprint / Speed
-
-    <br>
-
-    <b>E</b>
-    Interact
-
+    <b>W A S D</b> Move / Drive<br>
+    <b>SHIFT</b> Sprint / Speed<br>
+    <b>E</b> Interact
   </div>
-
-
-  <!-- MOUSE -->
 
   <div id="mouseHint">
-
-    Hold
-    <b>RIGHT CLICK</b>
-    + move mouse
-
+    Hold <b>RIGHT CLICK</b> + move mouse
   </div>
-
-
-  <!-- VEHICLE MENU -->
 
   <div id="vehicleMenu">
-
-    <h2>
-      🚗 Vehicle Dealership
-    </h2>
+    <h2>🚗 Vehicle Dealership</h2>
 
     <p>
-      Select a vehicle to purchase.
+      Choose a vehicle.
     </p>
 
+    <div id="vehicleList"></div>
 
-    <div id="vehicleList">
-    </div>
-
-
-    <button
-      id="closeVehicleMenu"
-    >
+    <button id="closeVehicleMenu">
       Close
     </button>
-
   </div>
 
-
-  <!-- NOTIFICATION -->
-
-  <div id="notification">
-  </div>
-
+  <div id="notification"></div>
 
   <script type="module">
-
-
-    // ==================================================
-    // IMPORTS
-    // ==================================================
 
     import * as THREE from
       "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
 
-    import { createPlayer } from
-      "./player.js";
-
-
     // ==================================================
-    // GAME
+    // GAME SETUP
     // ==================================================
 
     const game =
-      document.getElementById(
-        "game"
-      );
-
+      document.getElementById("game");
 
     const scene =
       new THREE.Scene();
 
-
     scene.background =
-      new THREE.Color(
-        0x87ceeb
-      );
+      new THREE.Color(0x87ceeb);
 
 
     const camera =
       new THREE.PerspectiveCamera(
         70,
-        window.innerWidth /
-        window.innerHeight,
+        window.innerWidth / window.innerHeight,
         0.1,
         1000
       );
@@ -899,8 +317,7 @@
 
     const renderer =
       new THREE.WebGLRenderer({
-        antialias:
-          true
+        antialias: true
       });
 
 
@@ -909,61 +326,43 @@
       window.innerHeight
     );
 
-
     renderer.setPixelRatio(
-      Math.min(
-        window.devicePixelRatio,
-        2
-      )
+      Math.min(window.devicePixelRatio, 2)
     );
 
+    renderer.shadowMap.enabled = true;
 
-    renderer.shadowMap.enabled =
-      true;
-
-
-    game.appendChild(
-      renderer.domElement
-    );
+    game.appendChild(renderer.domElement);
 
 
     // ==================================================
     // LIGHTING
     // ==================================================
 
-    const sunlight =
+    const sun =
       new THREE.DirectionalLight(
         0xffffff,
         2
       );
 
-
-    sunlight.position.set(
+    sun.position.set(
       50,
       100,
       50
     );
 
+    sun.castShadow = true;
 
-    sunlight.castShadow =
-      true;
-
-
-    scene.add(
-      sunlight
-    );
+    scene.add(sun);
 
 
     const ambient =
       new THREE.AmbientLight(
         0xffffff,
-        0.6
+        0.65
       );
 
-
-    scene.add(
-      ambient
-    );
+    scene.add(ambient);
 
 
     // ==================================================
@@ -972,31 +371,21 @@
 
     const ground =
       new THREE.Mesh(
-
         new THREE.PlaneGeometry(
           500,
           500
         ),
-
         new THREE.MeshStandardMaterial({
-          color:
-            0x3b7d3b
+          color: 0x3d813d
         })
-
       );
-
 
     ground.rotation.x =
       -Math.PI / 2;
 
+    ground.receiveShadow = true;
 
-    ground.receiveShadow =
-      true;
-
-
-    scene.add(
-      ground
-    );
+    scene.add(ground);
 
 
     // ==================================================
@@ -1005,60 +394,42 @@
 
     const road =
       new THREE.Mesh(
-
         new THREE.BoxGeometry(
           30,
           0.1,
           500
         ),
-
         new THREE.MeshStandardMaterial({
-          color:
-            0x333333
+          color: 0x303030
         })
-
       );
 
+    road.position.y = 0.05;
 
-    road.position.y =
-      0.05;
-
-
-    scene.add(
-      road
-    );
+    scene.add(road);
 
 
     // ==================================================
-    // ROAD MARKINGS
+    // ROAD LINES
     // ==================================================
-
-    const roadLineMaterial =
-      new THREE.MeshStandardMaterial({
-        color:
-          0xffffff
-      });
-
 
     for (
       let z = -240;
-      z < 240;
+      z <= 240;
       z += 10
     ) {
 
       const line =
         new THREE.Mesh(
-
           new THREE.BoxGeometry(
-            0.25,
-            0.03,
+            0.22,
+            0.04,
             5
           ),
-
-          roadLineMaterial
-
+          new THREE.MeshStandardMaterial({
+            color: 0xffffff
+          })
         );
-
 
       line.position.set(
         0,
@@ -1066,20 +437,179 @@
         z
       );
 
-
-      scene.add(
-        line
-      );
-
+      scene.add(line);
     }
 
 
     // ==================================================
-    // PLAYER
+    // PLAYER CHARACTER
     // ==================================================
 
+    function createCharacter() {
+
+      const character =
+        new THREE.Group();
+
+
+      // Legs
+
+      const legMaterial =
+        new THREE.MeshStandardMaterial({
+          color: 0x202020
+        });
+
+
+      const leftLeg =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.35,
+            1,
+            0.35
+          ),
+          legMaterial
+        );
+
+      leftLeg.position.set(
+        -0.22,
+        0.5,
+        0
+      );
+
+      leftLeg.castShadow = true;
+
+      character.add(leftLeg);
+
+
+      const rightLeg =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.35,
+            1,
+            0.35
+          ),
+          legMaterial
+        );
+
+      rightLeg.position.set(
+        0.22,
+        0.5,
+        0
+      );
+
+      rightLeg.castShadow = true;
+
+      character.add(rightLeg);
+
+
+      // Body
+
+      const body =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.9,
+            1.15,
+            0.5
+          ),
+          new THREE.MeshStandardMaterial({
+            color: 0x2455a6
+          })
+        );
+
+      body.position.y = 1.45;
+
+      body.castShadow = true;
+
+      character.add(body);
+
+
+      // Head
+
+      const head =
+        new THREE.Mesh(
+          new THREE.SphereGeometry(
+            0.38,
+            20,
+            20
+          ),
+          new THREE.MeshStandardMaterial({
+            color: 0xf0bd91
+          })
+        );
+
+      head.position.y = 2.3;
+
+      head.castShadow = true;
+
+      character.add(head);
+
+
+      // Arms
+
+      const armMaterial =
+        new THREE.MeshStandardMaterial({
+          color: 0x2455a6
+        });
+
+
+      const leftArm =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.3,
+            1,
+            0.3
+          ),
+          armMaterial
+        );
+
+      leftArm.position.set(
+        -0.62,
+        1.45,
+        0
+      );
+
+      leftArm.castShadow = true;
+
+      character.add(leftArm);
+
+
+      const rightArm =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            0.3,
+            1,
+            0.3
+          ),
+          armMaterial
+        );
+
+      rightArm.position.set(
+        0.62,
+        1.45,
+        0
+      );
+
+      rightArm.castShadow = true;
+
+      character.add(rightArm);
+
+
+      character.userData = {
+        job: "Civilian",
+        money: 500,
+        xp: 0,
+        wantedLevel: 0,
+        sprinting: false,
+        inVehicle: false,
+        vehicle: null
+      };
+
+
+      return character;
+    }
+
+
     const player =
-      createPlayer();
+      createCharacter();
 
 
     player.position.set(
@@ -1089,37 +619,21 @@
     );
 
 
-    scene.add(
-      player
-    );
+    scene.add(player);
 
 
     // ==================================================
     // CAMERA
     // ==================================================
 
-    let cameraYaw =
-      0;
+    let cameraYaw = 0;
+
+    let cameraPitch = 0.25;
+
+    let rightMouseDown = false;
 
 
-    let cameraPitch =
-      0.25;
-
-
-    const cameraDistance =
-      9;
-
-
-    const cameraHeight =
-      3.2;
-
-
-    const mouseSensitivity =
-      0.004;
-
-
-    let rightMouseDown =
-      false;
+    const mouseSensitivity = 0.004;
 
 
     // ==================================================
@@ -1139,8 +653,7 @@
 
 
         if (
-          event.key.toLowerCase()
-          === "e"
+          event.key.toLowerCase() === "e"
         ) {
 
           handleInteraction();
@@ -1164,15 +677,13 @@
 
 
     // ==================================================
-    // RIGHT CLICK CAMERA
+    // MOUSE
     // ==================================================
 
     renderer.domElement.addEventListener(
       "contextmenu",
       event => {
-
         event.preventDefault();
-
       }
     );
 
@@ -1181,12 +692,9 @@
       "mousedown",
       event => {
 
-        if (
-          event.button === 2
-        ) {
+        if (event.button === 2) {
 
-          rightMouseDown =
-            true;
+          rightMouseDown = true;
 
         }
 
@@ -1198,12 +706,9 @@
       "mouseup",
       event => {
 
-        if (
-          event.button === 2
-        ) {
+        if (event.button === 2) {
 
-          rightMouseDown =
-            false;
+          rightMouseDown = false;
 
         }
 
@@ -1215,12 +720,8 @@
       "mousemove",
       event => {
 
-        if (
-          !rightMouseDown
-        ) {
-
+        if (!rightMouseDown) {
           return;
-
         }
 
 
@@ -1246,444 +747,267 @@
 
 
     // ==================================================
-    // VEHICLE DATA
+    // VEHICLES
     // ==================================================
 
     const vehicles = [
 
       {
-        id:
-          "hatchback",
-
-        name:
-          "UK Hatchback",
-
-        price:
-          0,
-
-        type:
-          "Civilian",
-
-        color:
-          0xeeeeee
-
+        id: "hatchback",
+        name: "UK Hatchback",
+        price: 0,
+        type: "Civilian",
+        color: 0xffffff
       },
 
       {
-        id:
-          "saloon",
-
-        name:
-          "UK Saloon",
-
-        price:
-          2500,
-
-        type:
-          "Civilian",
-
-        color:
-          0x222222
-
+        id: "saloon",
+        name: "UK Saloon",
+        price: 2500,
+        type: "Civilian",
+        color: 0x222222
       },
 
       {
-        id:
-          "suv",
-
-        name:
-          "UK SUV",
-
-        price:
-          5000,
-
-        type:
-          "Civilian",
-
-        color:
-          0x555555
-
+        id: "suv",
+        name: "UK SUV",
+        price: 5000,
+        type: "Civilian",
+        color: 0x555555
       },
 
       {
-        id:
-          "police",
-
-        name:
-          "Police Response",
-
-        price:
-          15000,
-
-        type:
-          "Police",
-
-        color:
-          0x111111,
-
-        emergency:
-          true
-
+        id: "police",
+        name: "Police Response",
+        price: 15000,
+        type: "Police",
+        color: 0x111111,
+        emergency: true
       },
 
       {
-        id:
-          "fire",
-
-        name:
-          "Fire Engine",
-
-        price:
-          30000,
-
-        type:
-          "Fire",
-
-        color:
-          0xcc2222,
-
-        emergency:
-          true
-
+        id: "fire",
+        name: "Fire Engine",
+        price: 30000,
+        type: "Fire",
+        color: 0xcc2222,
+        emergency: true
       },
 
       {
-        id:
-          "ambulance",
-
-        name:
-          "Ambulance",
-
-        price:
-          25000,
-
-        type:
-          "Ambulance",
-
-        color:
-          0xffffff,
-
-        emergency:
-          true
-
+        id: "ambulance",
+        name: "Ambulance",
+        price: 25000,
+        type: "Ambulance",
+        color: 0xffffff,
+        emergency: true
       },
 
       {
-        id:
-          "hems",
-
-        name:
-          "HEMS Response",
-
-        price:
-          50000,
-
-        type:
-          "HEMS",
-
-        color:
-          0xffff00,
-
-        emergency:
-          true
-
+        id: "hems",
+        name: "HEMS Response",
+        price: 50000,
+        type: "HEMS",
+        color: 0xffff00,
+        emergency: true
       }
 
     ];
 
 
-    // ==================================================
-    // CURRENT VEHICLE
-    // ==================================================
+    let currentVehicle = null;
 
-    let currentVehicle =
-      null;
+    let currentVehicleData = null;
 
-
-    let currentVehicleData =
-      null;
-
-
-    let inVehicle =
-      false;
+    let inVehicle = false;
 
 
     // ==================================================
-    // VEHICLE CREATION
+    // CREATE VEHICLE
     // ==================================================
 
-    function createVehicle(
-      data
-    ) {
+    function createVehicle(data) {
 
       const vehicle =
         new THREE.Group();
 
 
-      vehicle.name =
-        data.name;
-
-
-      // BODY
+      // Body
 
       const body =
         new THREE.Mesh(
-
           new THREE.BoxGeometry(
-            2.1,
-            0.65,
-            4
+            2.2,
+            0.7,
+            4.2
           ),
-
           new THREE.MeshStandardMaterial({
-            color:
-              data.color
+            color: data.color
           })
-
         );
 
+      body.position.y = 0.9;
 
-      body.position.y =
-        0.9;
+      body.castShadow = true;
 
-
-      body.castShadow =
-        true;
+      vehicle.add(body);
 
 
-      vehicle.add(
-        body
-      );
+      // Cabin
 
-
-      // ROOF
-
-      const roof =
+      const cabin =
         new THREE.Mesh(
-
           new THREE.BoxGeometry(
             1.7,
-            0.6,
+            0.7,
             2
           ),
-
           new THREE.MeshStandardMaterial({
-            color:
-              data.color
+            color: data.color
           })
-
         );
 
+      cabin.position.y = 1.55;
 
-      roof.position.y =
-        1.5;
+      cabin.castShadow = true;
 
-
-      roof.castShadow =
-        true;
+      vehicle.add(cabin);
 
 
-      vehicle.add(
-        roof
-      );
+      // Windows
 
-
-      // WINDOWS
-
-      const windowMaterial =
+      const glass =
         new THREE.MeshStandardMaterial({
-          color:
-            0x6da7c7,
-
-          metalness:
-            0.2,
-
-          roughness:
-            0.2
-
+          color: 0x6098b5,
+          metalness: 0.2,
+          roughness: 0.2
         });
 
 
       const frontWindow =
         new THREE.Mesh(
-
           new THREE.BoxGeometry(
-            1.45,
+            1.4,
             0.45,
             0.08
           ),
-
-          windowMaterial
-
+          glass
         );
-
 
       frontWindow.position.set(
         0,
-        1.55,
-        1.03
+        1.58,
+        1.04
       );
 
-
-      vehicle.add(
-        frontWindow
-      );
+      vehicle.add(frontWindow);
 
 
       const rearWindow =
         new THREE.Mesh(
-
           new THREE.BoxGeometry(
-            1.45,
+            1.4,
             0.45,
             0.08
           ),
-
-          windowMaterial
-
+          glass
         );
-
 
       rearWindow.position.set(
         0,
-        1.55,
-        -1.03
+        1.58,
+        -1.04
       );
 
-
-      vehicle.add(
-        rearWindow
-      );
+      vehicle.add(rearWindow);
 
 
-      // WHEELS
-
-      const wheelMaterial =
-        new THREE.MeshStandardMaterial({
-          color:
-            0x111111
-        });
-
+      // Wheels
 
       const wheelPositions = [
-
-        [-1.05, 0.55, 1.25],
-
-        [1.05, 0.55, 1.25],
-
-        [-1.05, 0.55, -1.25],
-
-        [1.05, 0.55, -1.25]
-
+        [-1.12, 0.55, 1.3],
+        [1.12, 0.55, 1.3],
+        [-1.12, 0.55, -1.3],
+        [1.12, 0.55, -1.3]
       ];
 
 
       for (
-        const position
-        of wheelPositions
+        const pos of wheelPositions
       ) {
 
         const wheel =
           new THREE.Mesh(
-
             new THREE.CylinderGeometry(
               0.42,
               0.42,
-              0.25,
+              0.3,
               20
             ),
-
-            wheelMaterial
-
+            new THREE.MeshStandardMaterial({
+              color: 0x111111
+            })
           );
-
 
         wheel.rotation.z =
           Math.PI / 2;
 
-
         wheel.position.set(
-          position[0],
-          position[1],
-          position[2]
+          pos[0],
+          pos[1],
+          pos[2]
         );
 
+        wheel.castShadow = true;
 
-        wheel.castShadow =
-          true;
-
-
-        vehicle.add(
-          wheel
-        );
+        vehicle.add(wheel);
 
       }
 
 
-      // ==================================================
-      // EMERGENCY LIGHT BAR
-      // ==================================================
+      // Emergency light bar
 
-      if (
-        data.emergency
-      ) {
+      if (data.emergency) {
 
         const lightBar =
           new THREE.Mesh(
-
             new THREE.BoxGeometry(
               1.3,
-              0.15,
+              0.16,
               0.35
             ),
-
             new THREE.MeshStandardMaterial({
-              color:
-                0x0055ff,
-
-              emissive:
-                0x0033ff,
-
-              emissiveIntensity:
-                2
+              color: 0x004cff,
+              emissive: 0x003cff,
+              emissiveIntensity: 2
             })
-
           );
 
+        lightBar.position.y = 2;
 
-        lightBar.position.y =
-          1.9;
-
-
-        vehicle.add(
-          lightBar
-        );
+        vehicle.add(lightBar);
 
       }
 
 
-      vehicle.userData =
-        {
+      vehicle.userData = {
 
-          vehicleData:
-            data,
+        speed: 0,
 
-          speed:
-            0,
+        maxSpeed:
+          data.type === "Fire"
+            ? 12
+            : 20,
 
-          maxSpeed:
-            18,
+        acceleration: 10,
 
-          acceleration:
-            10,
+        braking: 15,
 
-          braking:
-            16,
+        steering: 2.2,
 
-          steering:
-            2.2
+        data: data
 
-        };
+      };
 
 
       return vehicle;
@@ -1692,7 +1016,7 @@
 
 
     // ==================================================
-    // VEHICLE DEALERSHIP
+    // DEALERSHIP
     // ==================================================
 
     const dealership =
@@ -1706,74 +1030,64 @@
     );
 
 
-    scene.add(
-      dealership
-    );
+    scene.add(dealership);
 
-
-    // Dealership building
 
     const dealershipBuilding =
       new THREE.Mesh(
-
         new THREE.BoxGeometry(
           10,
           6,
           10
         ),
-
         new THREE.MeshStandardMaterial({
-          color:
-            0x777777
+          color: 0x777777
         })
-
       );
 
 
-    dealershipBuilding.position.y =
-      3;
-
+    dealershipBuilding.position.y = 3;
 
     dealership.add(
       dealershipBuilding
     );
 
 
-    // Dealership sign
+    // Windows
 
-    const sign =
-      new THREE.Mesh(
+    const buildingGlass =
+      new THREE.MeshStandardMaterial({
+        color: 0x4b9ac0,
+        metalness: 0.2,
+        roughness: 0.2
+      });
 
-        new THREE.BoxGeometry(
-          7,
-          1,
-          0.2
-        ),
 
-        new THREE.MeshStandardMaterial({
-          color:
-            0x2563eb,
+    for (
+      let x = -3;
+      x <= 3;
+      x += 2
+    ) {
 
-          emissive:
-            0x102f8f,
+      const window =
+        new THREE.Mesh(
+          new THREE.BoxGeometry(
+            1.4,
+            1.8,
+            0.08
+          ),
+          buildingGlass
+        );
 
-          emissiveIntensity:
-            0.8
-        })
-
+      window.position.set(
+        x,
+        3,
+        5.05
       );
 
+      dealership.add(window);
 
-    sign.position.set(
-      0,
-      5,
-      5.1
-    );
-
-
-    dealership.add(
-      sign
-    );
+    }
 
 
     // ==================================================
@@ -1794,20 +1108,17 @@
 
     function openVehicleMenu() {
 
-      vehicleList.innerHTML =
-        "";
+      vehicleList.innerHTML = "";
 
 
       for (
-        const vehicle
-        of vehicles
+        const vehicle of vehicles
       ) {
 
         const card =
           document.createElement(
             "div"
           );
-
 
         card.className =
           "vehicleCard";
@@ -1818,7 +1129,6 @@
             "div"
           );
 
-
         info.className =
           "vehicleInfo";
 
@@ -1827,7 +1137,6 @@
           document.createElement(
             "strong"
           );
-
 
         title.textContent =
           vehicle.name;
@@ -1838,28 +1147,21 @@
             "small"
           );
 
-
         description.textContent =
           vehicle.type +
           " • £" +
           vehicle.price.toLocaleString();
 
 
-        info.appendChild(
-          title
-        );
+        info.appendChild(title);
 
-
-        info.appendChild(
-          description
-        );
+        info.appendChild(description);
 
 
         const button =
           document.createElement(
             "button"
           );
-
 
         button.className =
           "vehicleButton";
@@ -1871,31 +1173,21 @@
             : "Buy";
 
 
-        button.addEventListener(
-          "click",
+        button.onclick =
           () => {
 
-            purchaseVehicle(
+            spawnVehicle(
               vehicle
             );
 
-          }
-        );
+          };
 
 
-        card.appendChild(
-          info
-        );
+        card.appendChild(info);
 
+        card.appendChild(button);
 
-        card.appendChild(
-          button
-        );
-
-
-        vehicleList.appendChild(
-          card
-        );
+        vehicleList.appendChild(card);
 
       }
 
@@ -1910,24 +1202,20 @@
       .getElementById(
         "closeVehicleMenu"
       )
-      .addEventListener(
-        "click",
-        () => {
+      .onclick =
+      () => {
 
-          vehicleMenu.style.display =
-            "none";
+        vehicleMenu.style.display =
+          "none";
 
-        }
-      );
+      };
 
 
     // ==================================================
-    // NOTIFICATIONS
+    // NOTIFICATION
     // ==================================================
 
-    function notify(
-      message
-    ) {
+    function notify(message) {
 
       const notification =
         document.getElementById(
@@ -1950,31 +1238,25 @@
             "none";
 
         },
-        2500
+        2200
       );
 
     }
 
 
     // ==================================================
-    // BUY / SPAWN VEHICLE
+    // SPAWN VEHICLE
     // ==================================================
 
-    function purchaseVehicle(
-      data
-    ) {
+    function spawnVehicle(data) {
 
-      if (
-        currentVehicle
-      ) {
+      if (currentVehicle) {
 
         scene.remove(
           currentVehicle
         );
 
-
-        currentVehicle =
-          null;
+        currentVehicle = null;
 
       }
 
@@ -1998,9 +1280,7 @@
 
 
       currentVehicle =
-        createVehicle(
-          data
-        );
+        createVehicle(data);
 
 
       currentVehicle.position.set(
@@ -2014,13 +1294,13 @@
         player.rotation.y;
 
 
+      currentVehicleData =
+        data;
+
+
       scene.add(
         currentVehicle
       );
-
-
-      currentVehicleData =
-        data;
 
 
       vehicleMenu.style.display =
@@ -2029,7 +1309,7 @@
 
       notify(
         data.name +
-        " spawned."
+        " spawned!"
       );
 
     }
@@ -2041,12 +1321,8 @@
 
     function enterVehicle() {
 
-      if (
-        !currentVehicle
-      ) {
-
+      if (!currentVehicle) {
         return;
-
       }
 
 
@@ -2056,29 +1332,20 @@
         );
 
 
-      if (
-        distance > 5
-      ) {
-
+      if (distance > 5) {
         return;
-
       }
 
 
-      inVehicle =
-        true;
-
+      inVehicle = true;
 
       player.userData.inVehicle =
         true;
 
-
       player.userData.vehicle =
         currentVehicle;
 
-
-      player.visible =
-        false;
+      player.visible = false;
 
 
       notify(
@@ -2095,37 +1362,28 @@
 
     function exitVehicle() {
 
-      if (
-        !currentVehicle
-      ) {
-
+      if (!currentVehicle) {
         return;
-
       }
 
 
-      player.visible =
-        true;
-
+      inVehicle = false;
 
       player.userData.inVehicle =
         false;
-
 
       player.userData.vehicle =
         null;
 
 
-      inVehicle =
-        false;
+      player.visible = true;
 
 
-      player.position.x =
-        currentVehicle.position.x + 3;
-
-
-      player.position.z =
-        currentVehicle.position.z;
+      player.position.set(
+        currentVehicle.position.x + 3,
+        0,
+        currentVehicle.position.z
+      );
 
 
       notify(
@@ -2136,14 +1394,22 @@
 
 
     // ==================================================
-    // VEHICLE INTERACTION
+    // E INTERACTION
     // ==================================================
 
-    function handleVehicleInteraction() {
+    function handleInteraction() {
 
       if (
-        inVehicle
+        vehicleMenu.style.display ===
+        "block"
       ) {
+        return;
+      }
+
+
+      // If already driving
+
+      if (inVehicle) {
 
         exitVehicle();
 
@@ -2152,50 +1418,9 @@
       }
 
 
-      if (
-        currentVehicle
-      ) {
-
-        const distance =
-          player.position.distanceTo(
-            currentVehicle.position
-          );
-
-
-        if (
-          distance < 5
-        ) {
-
-          enterVehicle();
-
-        }
-
-      }
-
-    }
-
-
-    // ==================================================
-    // UNIVERSAL E INTERACTION
-    // ==================================================
-
-    function handleInteraction() {
-
-      if (
-        vehicleMenu.style.display
-        === "block"
-      ) {
-
-        return;
-
-      }
-
-
       // Vehicle
 
-      if (
-        currentVehicle
-      ) {
+      if (currentVehicle) {
 
         const distance =
           player.position.distanceTo(
@@ -2203,20 +1428,7 @@
           );
 
 
-        if (
-          inVehicle
-        ) {
-
-          exitVehicle();
-
-          return;
-
-        }
-
-
-        if (
-          distance < 5
-        ) {
+        if (distance < 5) {
 
           enterVehicle();
 
@@ -2257,55 +1469,27 @@
     // WALKING
     // ==================================================
 
-    function updateWalking(
-      delta
-    ) {
+    function updateWalking(delta) {
 
-      let forward =
-        0;
+      let forward = 0;
 
-
-      let sideways =
-        0;
+      let sideways = 0;
 
 
-      if (
-        keys["w"]
-      ) {
-
-        forward +=
-          1;
-
+      if (keys["w"]) {
+        forward += 1;
       }
 
-
-      if (
-        keys["s"]
-      ) {
-
-        forward -=
-          1;
-
+      if (keys["s"]) {
+        forward -= 1;
       }
 
-
-      if (
-        keys["d"]
-      ) {
-
-        sideways +=
-          1;
-
+      if (keys["d"]) {
+        sideways += 1;
       }
 
-
-      if (
-        keys["a"]
-      ) {
-
-        sideways -=
-          1;
-
+      if (keys["a"]) {
+        sideways -= 1;
       }
 
 
@@ -2313,35 +1497,14 @@
         forward === 0 &&
         sideways === 0
       ) {
-
-        player.userData.sprinting =
-          false;
-
         return;
-
       }
 
 
       let speed =
-        6;
-
-
-      if (
         keys["shift"]
-      ) {
-
-        speed =
-          11;
-
-        player.userData.sprinting =
-          true;
-
-      } else {
-
-        player.userData.sprinting =
-          false;
-
-      }
+          ? 11
+          : 6;
 
 
       const length =
@@ -2351,50 +1514,33 @@
         );
 
 
-      forward /=
-        length;
+      forward /= length;
 
-
-      sideways /=
-        length;
+      sideways /= length;
 
 
       const forwardX =
-        Math.sin(
-          cameraYaw
-        );
-
+        Math.sin(cameraYaw);
 
       const forwardZ =
-        Math.cos(
-          cameraYaw
-        );
+        Math.cos(cameraYaw);
 
 
       const rightX =
-        Math.cos(
-          cameraYaw
-        );
-
+        Math.cos(cameraYaw);
 
       const rightZ =
-        -Math.sin(
-          cameraYaw
-        );
+        -Math.sin(cameraYaw);
 
 
       const moveX =
-        forwardX *
-        forward +
-        rightX *
-        sideways;
+        forwardX * forward +
+        rightX * sideways;
 
 
       const moveZ =
-        forwardZ *
-        forward +
-        rightZ *
-        sideways;
+        forwardZ * forward +
+        rightZ * sideways;
 
 
       player.position.x +=
@@ -2408,6 +1554,8 @@
         speed *
         delta;
 
+
+      // Character faces movement
 
       const targetRotation =
         Math.atan2(
@@ -2423,12 +1571,8 @@
 
       difference =
         Math.atan2(
-          Math.sin(
-            difference
-          ),
-          Math.cos(
-            difference
-          )
+          Math.sin(difference),
+          Math.cos(difference)
         );
 
 
@@ -2446,75 +1590,50 @@
     // DRIVING
     // ==================================================
 
-    function updateDriving(
-      delta
-    ) {
+    function updateDriving(delta) {
 
-      if (
-        !currentVehicle
-      ) {
-
+      if (!currentVehicle) {
         return;
-
       }
 
 
-      let acceleration =
-        0;
-
-
-      if (
-        keys["w"]
-      ) {
-
-        acceleration =
-          1;
-
-      }
-
-
-      if (
-        keys["s"]
-      ) {
-
-        acceleration =
-          -1;
-
-      }
-
-
-      const vehicleData =
+      const data =
         currentVehicle.userData;
 
 
-      if (
-        acceleration !== 0
-      ) {
+      let acceleration = 0;
 
-        vehicleData.speed +=
+
+      if (keys["w"]) {
+        acceleration = 1;
+      }
+
+      if (keys["s"]) {
+        acceleration = -1;
+      }
+
+
+      if (acceleration !== 0) {
+
+        data.speed +=
           acceleration *
-          vehicleData.acceleration *
+          data.acceleration *
           delta;
 
       } else {
 
-        if (
-          vehicleData.speed > 0
-        ) {
+        if (data.speed > 0) {
 
-          vehicleData.speed -=
-            vehicleData.braking *
+          data.speed -=
+            data.braking *
             delta;
 
         }
 
+        if (data.speed < 0) {
 
-        if (
-          vehicleData.speed < 0
-        ) {
-
-          vehicleData.speed +=
-            vehicleData.braking *
+          data.speed +=
+            data.braking *
             delta;
 
         }
@@ -2522,25 +1641,15 @@
       }
 
 
-      // Shift boost
-
-      let maxSpeed =
-        vehicleData.maxSpeed;
-
-
-      if (
+      const maxSpeed =
         keys["shift"]
-      ) {
-
-        maxSpeed *=
-          1.5;
-
-      }
+          ? data.maxSpeed * 1.5
+          : data.maxSpeed;
 
 
-      vehicleData.speed =
+      data.speed =
         THREE.MathUtils.clamp(
-          vehicleData.speed,
+          data.speed,
           -maxSpeed / 2,
           maxSpeed
         );
@@ -2548,66 +1657,43 @@
 
       // Steering
 
-      let steering =
-        0;
+      let steering = 0;
 
 
-      if (
-        keys["a"]
-      ) {
+      if (keys["a"]) {
+        steering = 1;
+      }
 
-        steering =
-          1;
-
+      if (keys["d"]) {
+        steering = -1;
       }
 
 
       if (
-        keys["d"]
-      ) {
-
-        steering =
-          -1;
-
-      }
-
-
-      if (
-        Math.abs(
-          vehicleData.speed
-        ) > 0.2
+        Math.abs(data.speed) > 0.1
       ) {
 
         currentVehicle.rotation.y +=
           steering *
-          vehicleData.steering *
+          data.steering *
           delta *
-          (
-            vehicleData.speed /
-            maxSpeed
-          );
+          (data.speed / maxSpeed);
 
       }
 
 
-      // Move vehicle
-
       currentVehicle.translateZ(
-        vehicleData.speed *
-        delta
+        data.speed * delta
       );
 
 
-      // Keep player with vehicle
+      // Keep player inside vehicle
 
       player.position.copy(
         currentVehicle.position
       );
 
-
-      player.position.y =
-        0;
-
+      player.position.y = 0;
 
       player.rotation.y =
         currentVehicle.rotation.y;
@@ -2619,35 +1705,22 @@
     // CAMERA
     // ==================================================
 
-    function updateCamera(
-      delta
-    ) {
+    function updateCamera(delta) {
 
-      let target;
+      const target =
+        inVehicle && currentVehicle
 
+          ? new THREE.Vector3(
+              currentVehicle.position.x,
+              1.5,
+              currentVehicle.position.z
+            )
 
-      if (
-        inVehicle &&
-        currentVehicle
-      ) {
-
-        target =
-          new THREE.Vector3(
-            currentVehicle.position.x,
-            1.6,
-            currentVehicle.position.z
-          );
-
-      } else {
-
-        target =
-          new THREE.Vector3(
-            player.position.x,
-            player.position.y + 1.5,
-            player.position.z
-          );
-
-      }
+          : new THREE.Vector3(
+              player.position.x,
+              1.5,
+              player.position.z
+            );
 
 
       const distance =
@@ -2657,32 +1730,24 @@
 
 
       const horizontal =
-        Math.cos(
-          cameraPitch
-        ) *
+        Math.cos(cameraPitch) *
         distance;
 
 
       const vertical =
-        Math.sin(
-          cameraPitch
-        ) *
+        Math.sin(cameraPitch) *
         distance;
 
 
       const cameraX =
         target.x -
-        Math.sin(
-          cameraYaw
-        ) *
+        Math.sin(cameraYaw) *
         horizontal;
 
 
       const cameraZ =
         target.z -
-        Math.cos(
-          cameraYaw
-        ) *
+        Math.cos(cameraYaw) *
         horizontal;
 
 
@@ -2690,8 +1755,8 @@
         new THREE.Vector3(
           cameraX,
           target.y +
-          3.2 +
-          vertical,
+            3.2 +
+            vertical,
           cameraZ
         );
 
@@ -2710,15 +1775,13 @@
       );
 
 
-      camera.lookAt(
-        target
-      );
+      camera.lookAt(target);
 
     }
 
 
     // ==================================================
-    // INTERACTION DETECTION
+    // INTERACTION UI
     // ==================================================
 
     function updateInteraction() {
@@ -2729,44 +1792,30 @@
         );
 
 
-      // Vehicle
+      if (inVehicle) {
 
-      if (
-        currentVehicle
-      ) {
+        interaction.style.display =
+          "block";
 
-        if (
-          inVehicle
-        ) {
+        document.getElementById(
+          "interactionText"
+        ).textContent =
+          "Exit Vehicle";
 
-          nearbyInteraction =
-            "Exit Vehicle";
+        return;
 
-          interaction.style.display =
-            "block";
-
-          document.getElementById(
-            "interactionText"
-          ).textContent =
-            nearbyInteraction;
-
-          return;
-
-        }
+      }
 
 
-        const vehicleDistance =
+      if (currentVehicle) {
+
+        const distance =
           player.position.distanceTo(
             currentVehicle.position
           );
 
 
-        if (
-          vehicleDistance < 5
-        ) {
-
-          nearbyInteraction =
-            "Enter Vehicle";
+        if (distance < 5) {
 
           interaction.style.display =
             "block";
@@ -2774,7 +1823,7 @@
           document.getElementById(
             "interactionText"
           ).textContent =
-            nearbyInteraction;
+            "Enter Vehicle";
 
           return;
 
@@ -2782,8 +1831,6 @@
 
       }
 
-
-      // Dealership
 
       const dealershipDistance =
         player.position.distanceTo(
@@ -2795,24 +1842,17 @@
         dealershipDistance < 12
       ) {
 
-        nearbyInteraction =
-          "Open Dealership";
-
         interaction.style.display =
           "block";
 
         document.getElementById(
           "interactionText"
         ).textContent =
-          nearbyInteraction;
+          "Open Dealership";
 
         return;
 
       }
-
-
-      nearbyInteraction =
-        null;
 
 
       interaction.style.display =
@@ -2845,14 +1885,6 @@
       ).textContent =
         player.userData.xp;
 
-    }
-
-
-    // ==================================================
-    // WANTED
-    // ==================================================
-
-    function updateWanted() {
 
       const wanted =
         document.getElementById(
@@ -2860,22 +1892,17 @@
         );
 
 
-      const level =
-        player.userData.wantedLevel;
-
-
       if (
-        level > 0
+        player.userData.wantedLevel > 0
       ) {
 
         wanted.style.display =
           "block";
 
-
         document.getElementById(
           "wantedLevel"
         ).textContent =
-          level;
+          player.userData.wantedLevel;
 
       } else {
 
@@ -2909,35 +1936,22 @@
         );
 
 
-      if (
-        inVehicle
-      ) {
+      if (inVehicle) {
 
-        updateDriving(
-          delta
-        );
+        updateDriving(delta);
 
       } else {
 
-        updateWalking(
-          delta
-        );
+        updateWalking(delta);
 
       }
 
 
-      updateCamera(
-        delta
-      );
-
+      updateCamera(delta);
 
       updateInteraction();
 
-
       updateHUD();
-
-
-      updateWanted();
 
 
       renderer.render(
@@ -2963,9 +1977,7 @@
           window.innerWidth /
           window.innerHeight;
 
-
         camera.updateProjectionMatrix();
-
 
         renderer.setSize(
           window.innerWidth,
@@ -2978,5 +1990,4 @@
   </script>
 
 </body>
-
 </html>
