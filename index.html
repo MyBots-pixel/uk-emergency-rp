@@ -30,10 +30,6 @@
       display: block;
     }
 
-    /* =========================
-       INTERACTION
-    ========================= */
-
     #interaction {
       position: fixed;
       left: 50%;
@@ -72,11 +68,6 @@
       font-weight: 800;
     }
 
-
-    /* =========================
-       CROSSHAIR
-    ========================= */
-
     #crosshair {
       position: fixed;
 
@@ -95,11 +86,6 @@
       text-shadow:
         0 1px 3px black;
     }
-
-
-    /* =========================
-       CONTROLS
-    ========================= */
 
     #controls {
       position: fixed;
@@ -121,11 +107,6 @@
 
       pointer-events: none;
     }
-
-
-    /* =========================
-       TOP HUD
-    ========================= */
 
     #hud {
       position: fixed;
@@ -173,11 +154,6 @@
       font-weight: 700;
     }
 
-
-    /* =========================
-       WANTED
-    ========================= */
-
     #wanted {
       display: none;
 
@@ -198,16 +174,31 @@
 
       font-weight: 700;
     }
+
+    #mouseHint {
+      position: fixed;
+
+      right: 20px;
+      bottom: 20px;
+
+      padding: 10px 14px;
+
+      color: white;
+
+      background: rgba(0, 0, 0, 0.55);
+
+      border-radius: 9px;
+
+      font-size: 12px;
+
+      pointer-events: none;
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- GAME -->
   <div id="game"></div>
-
-
-  <!-- HUD -->
 
   <div id="hud">
 
@@ -217,6 +208,7 @@
 
     <div class="hudRow">
       <span>Job</span>
+
       <span
         id="job"
         class="hudValue"
@@ -227,6 +219,7 @@
 
     <div class="hudRow">
       <span>Money</span>
+
       <span
         id="money"
         class="hudValue"
@@ -237,6 +230,7 @@
 
     <div class="hudRow">
       <span>XP</span>
+
       <span
         id="xp"
         class="hudValue"
@@ -248,22 +242,21 @@
   </div>
 
 
-  <!-- WANTED -->
-
   <div id="wanted">
+
     🚨 WANTED
-    <span id="wantedLevel">0</span>
+
+    <span id="wantedLevel">
+      0
+    </span>
+
   </div>
 
-
-  <!-- CROSSHAIR -->
 
   <div id="crosshair">
     +
   </div>
 
-
-  <!-- INTERACTION -->
 
   <div id="interaction">
 
@@ -276,8 +269,6 @@
   </div>
 
 
-  <!-- CONTROLS -->
-
   <div id="controls">
 
     <b>W A S D</b> Move<br>
@@ -287,9 +278,12 @@
   </div>
 
 
-  <!-- =========================
-       GAME SCRIPT
-  ========================= -->
+  <div id="mouseHint">
+
+    Hold <b>RIGHT CLICK</b> + move mouse to look
+
+  </div>
+
 
   <script type="module">
 
@@ -299,9 +293,9 @@
     import { createPlayer } from "./player.js";
 
 
-    // =========================
+    // ==================================================
     // GAME SETUP
-    // =========================
+    // ==================================================
 
     const game =
       document.getElementById("game");
@@ -356,9 +350,9 @@
     );
 
 
-    // =========================
+    // ==================================================
     // LIGHTING
-    // =========================
+    // ==================================================
 
     const sunlight =
       new THREE.DirectionalLight(
@@ -395,27 +389,20 @@
     );
 
 
-    // =========================
+    // ==================================================
     // GROUND
-    // =========================
-
-    const groundGeometry =
-      new THREE.PlaneGeometry(
-        500,
-        500
-      );
-
-
-    const groundMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x3b7d3b
-      });
-
+    // ==================================================
 
     const ground =
       new THREE.Mesh(
-        groundGeometry,
-        groundMaterial
+        new THREE.PlaneGeometry(
+          500,
+          500
+        ),
+
+        new THREE.MeshStandardMaterial({
+          color: 0x3b7d3b
+        })
       );
 
 
@@ -432,28 +419,21 @@
     );
 
 
-    // =========================
-    // MAIN ROAD
-    // =========================
-
-    const roadGeometry =
-      new THREE.BoxGeometry(
-        30,
-        0.1,
-        500
-      );
-
-
-    const roadMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x333333
-      });
-
+    // ==================================================
+    // ROAD
+    // ==================================================
 
     const road =
       new THREE.Mesh(
-        roadGeometry,
-        roadMaterial
+        new THREE.BoxGeometry(
+          30,
+          0.1,
+          500
+        ),
+
+        new THREE.MeshStandardMaterial({
+          color: 0x333333
+        })
       );
 
 
@@ -466,11 +446,11 @@
     );
 
 
-    // =========================
+    // ==================================================
     // ROAD MARKINGS
-    // =========================
+    // ==================================================
 
-    const lineMaterial =
+    const roadLineMaterial =
       new THREE.MeshStandardMaterial({
         color: 0xffffff
       });
@@ -489,7 +469,8 @@
             0.03,
             5
           ),
-          lineMaterial
+
+          roadLineMaterial
         );
 
 
@@ -507,9 +488,9 @@
     }
 
 
-    // =========================
+    // ==================================================
     // PLAYER
-    // =========================
+    // ==================================================
 
     const player =
       createPlayer();
@@ -527,20 +508,37 @@
     );
 
 
-    // =========================
-    // CAMERA
-    // =========================
+    // ==================================================
+    // CAMERA SETTINGS
+    // ==================================================
 
-    camera.position.set(
-      0,
-      5,
-      14
-    );
+    let cameraYaw =
+      0;
 
 
-    // =========================
+    let cameraPitch =
+      0.25;
+
+
+    const cameraDistance =
+      9;
+
+
+    const cameraHeight =
+      3.2;
+
+
+    const mouseSensitivity =
+      0.004;
+
+
+    let rightMouseDown =
+      false;
+
+
+    // ==================================================
     // KEYBOARD
-    // =========================
+    // ==================================================
 
     const keys = {};
 
@@ -553,8 +551,6 @@
           event.key.toLowerCase()
         ] = true;
 
-
-        // Universal interaction
 
         if (
           event.key.toLowerCase()
@@ -581,9 +577,91 @@
     );
 
 
-    // =========================
+    // ==================================================
+    // RIGHT MOUSE CAMERA
+    // ==================================================
+
+    renderer.domElement.addEventListener(
+      "contextmenu",
+      event => {
+
+        event.preventDefault();
+
+      }
+    );
+
+
+    renderer.domElement.addEventListener(
+      "mousedown",
+      event => {
+
+        if (
+          event.button === 2
+        ) {
+
+          rightMouseDown =
+            true;
+
+        }
+
+      }
+    );
+
+
+    window.addEventListener(
+      "mouseup",
+      event => {
+
+        if (
+          event.button === 2
+        ) {
+
+          rightMouseDown =
+            false;
+
+        }
+
+      }
+    );
+
+
+    window.addEventListener(
+      "mousemove",
+      event => {
+
+        if (
+          !rightMouseDown
+        ) {
+
+          return;
+
+        }
+
+
+        cameraYaw -=
+          event.movementX *
+          mouseSensitivity;
+
+
+        cameraPitch -=
+          event.movementY *
+          mouseSensitivity;
+
+
+        cameraPitch =
+          THREE.MathUtils.clamp(
+            cameraPitch,
+            -0.45,
+            0.8
+          );
+
+      }
+    );
+
+
+    // ==================================================
     // INTERACTION
-    // =========================
+    // ==================================================
 
     let nearbyInteraction =
       null;
@@ -606,25 +684,6 @@
       );
 
 
-      /*
-        Later this will open
-        actual menus.
-
-        Examples:
-
-        Vehicle dealership
-        Enter vehicle
-        Police job
-        Fire job
-        Ambulance job
-        HEMS job
-        Doors
-        Shops
-        Garages
-        Admin interactions
-      */
-
-
       alert(
         nearbyInteraction
       );
@@ -632,9 +691,9 @@
     }
 
 
-    // =========================
+    // ==================================================
     // BUILDINGS
-    // =========================
+    // ==================================================
 
     function createBuilding(
       x,
@@ -648,8 +707,6 @@
         new THREE.Group();
 
 
-      // Building body
-
       const body =
         new THREE.Mesh(
           new THREE.BoxGeometry(
@@ -657,6 +714,7 @@
             height,
             depth
           ),
+
           new THREE.MeshStandardMaterial({
             color: 0xb8b8b8
           })
@@ -680,9 +738,9 @@
       );
 
 
-      // =========================
-      // WINDOWS
-      // =========================
+      // --------------------------
+      // FRONT WINDOWS
+      // --------------------------
 
       const windowMaterial =
         new THREE.MeshStandardMaterial({
@@ -715,6 +773,7 @@
                 1.3,
                 0.08
               ),
+
               windowMaterial
             );
 
@@ -735,7 +794,9 @@
       }
 
 
-      // Back windows
+      // --------------------------
+      // BACK WINDOWS
+      // --------------------------
 
       for (
         let y = 2;
@@ -760,6 +821,7 @@
                 1.3,
                 0.08
               ),
+
               windowMaterial
             );
 
@@ -794,9 +856,9 @@
     }
 
 
-    // =========================
-    // CITY BUILDINGS
-    // =========================
+    // ==================================================
+    // CITY
+    // ==================================================
 
     createBuilding(
       -35,
@@ -834,9 +896,9 @@
     );
 
 
-    // =========================
+    // ==================================================
     // INTERACTION POINT
-    // =========================
+    // ==================================================
 
     const interactionPoint =
       new THREE.Vector3(
@@ -846,41 +908,166 @@
       );
 
 
-    // =========================
-    // GAME CLOCK
-    // =========================
+    // ==================================================
+    // CLOCK
+    // ==================================================
 
     const clock =
       new THREE.Clock();
 
 
-    // =========================
-    // GAME LOOP
-    // =========================
+    // ==================================================
+    // CAMERA CALCULATION
+    // ==================================================
 
-    function animate() {
+    function updateCamera(
+      delta
+    ) {
 
-      requestAnimationFrame(
-        animate
+      const target =
+        new THREE.Vector3(
+          player.position.x,
+          player.position.y + 1.5,
+          player.position.z
+        );
+
+
+      const horizontalDistance =
+        Math.cos(
+          cameraPitch
+        ) *
+        cameraDistance;
+
+
+      const verticalDistance =
+        Math.sin(
+          cameraPitch
+        ) *
+        cameraDistance;
+
+
+      const cameraX =
+        target.x -
+        Math.sin(cameraYaw) *
+        horizontalDistance;
+
+
+      const cameraZ =
+        target.z -
+        Math.cos(cameraYaw) *
+        horizontalDistance;
+
+
+      const desiredPosition =
+        new THREE.Vector3(
+          cameraX,
+          target.y + cameraHeight + verticalDistance,
+          cameraZ
+        );
+
+
+      const smoothing =
+        1 -
+        Math.pow(
+          0.001,
+          delta
+        );
+
+
+      camera.position.lerp(
+        desiredPosition,
+        smoothing
       );
 
 
-      const delta =
-        clock.getDelta();
+      camera.lookAt(
+        target
+      );
+
+    }
 
 
-      // =========================
-      // MOVEMENT
-      // =========================
+    // ==================================================
+    // PLAYER MOVEMENT
+    // ==================================================
 
-      let speed = 6;
+    function updatePlayer(
+      delta
+    ) {
+
+      let forward =
+        0;
+
+
+      let sideways =
+        0;
+
+
+      if (
+        keys["w"]
+      ) {
+
+        forward += 1;
+
+      }
+
+
+      if (
+        keys["s"]
+      ) {
+
+        forward -= 1;
+
+      }
+
+
+      if (
+        keys["d"]
+      ) {
+
+        sideways += 1;
+
+      }
+
+
+      if (
+        keys["a"]
+      ) {
+
+        sideways -= 1;
+
+      }
+
+
+      const moving =
+        forward !== 0 ||
+        sideways !== 0;
+
+
+      if (
+        !moving
+      ) {
+
+        player.userData.sprinting =
+          false;
+
+        return;
+
+      }
+
+
+      // Sprint
+
+      let speed =
+        6;
 
 
       if (
         keys["shift"]
       ) {
 
-        speed = 11;
+        speed =
+          11;
 
         player.userData.sprinting =
           true;
@@ -893,82 +1080,152 @@
       }
 
 
-      const movement =
-        speed * delta;
+      // Normalize diagonal movement
 
-
-      if (
-        keys["w"]
-      ) {
-
-        player.position.z -=
-          movement;
-
-      }
-
-
-      if (
-        keys["s"]
-      ) {
-
-        player.position.z +=
-          movement;
-
-      }
-
-
-      if (
-        keys["a"]
-      ) {
-
-        player.position.x -=
-          movement;
-
-      }
-
-
-      if (
-        keys["d"]
-      ) {
-
-        player.position.x +=
-          movement;
-
-      }
-
-
-      // =========================
-      // CAMERA FOLLOW
-      // =========================
-
-      const cameraTarget =
-        new THREE.Vector3(
-          player.position.x,
-          1.5,
-          player.position.z
+      const length =
+        Math.sqrt(
+          forward * forward +
+          sideways * sideways
         );
 
 
-      camera.position.x =
-        player.position.x;
+      forward /=
+        length;
 
 
-      camera.position.z =
-        player.position.z + 12;
+      sideways /=
+        length;
 
 
-      camera.position.y =
-        5;
+      // Camera-relative movement
+
+      const forwardX =
+        Math.sin(
+          cameraYaw
+        );
 
 
-      camera.lookAt(
-        cameraTarget
+      const forwardZ =
+        Math.cos(
+          cameraYaw
+        );
+
+
+      const rightX =
+        Math.cos(
+          cameraYaw
+        );
+
+
+      const rightZ =
+        -Math.sin(
+          cameraYaw
+        );
+
+
+      const moveX =
+        (
+          forwardX *
+          forward
+        ) +
+        (
+          rightX *
+          sideways
+        );
+
+
+      const moveZ =
+        (
+          forwardZ *
+          forward
+        ) +
+        (
+          rightZ *
+          sideways
+        );
+
+
+      const movement =
+        speed *
+        delta;
+
+
+      player.position.x +=
+        moveX *
+        movement;
+
+
+      player.position.z +=
+        moveZ *
+        movement;
+
+
+      // Character faces movement direction
+
+      const targetRotation =
+        Math.atan2(
+          moveX,
+          moveZ
+        );
+
+
+      let rotationDifference =
+        targetRotation -
+        player.rotation.y;
+
+
+      rotationDifference =
+        Math.atan2(
+          Math.sin(
+            rotationDifference
+          ),
+          Math.cos(
+            rotationDifference
+          )
+        );
+
+
+      player.rotation.y +=
+        rotationDifference *
+        Math.min(
+          1,
+          delta * 12
+        );
+
+    }
+
+
+    // ==================================================
+    // GAME LOOP
+    // ==================================================
+
+    function animate() {
+
+      requestAnimationFrame(
+        animate
       );
 
 
-      // =========================
+      const delta =
+        Math.min(
+          clock.getDelta(),
+          0.05
+        );
+
+
+      updatePlayer(
+        delta
+      );
+
+
+      updateCamera(
+        delta
+      );
+
+
+      // ==================================================
       // INTERACTION RANGE
-      // =========================
+      // ==================================================
 
       const distance =
         player.position.distanceTo(
@@ -1011,9 +1268,9 @@
       }
 
 
-      // =========================
-      // UPDATE HUD
-      // =========================
+      // ==================================================
+      // HUD
+      // ==================================================
 
       document.getElementById(
         "job"
@@ -1034,9 +1291,9 @@
         player.userData.xp;
 
 
-      // =========================
-      // WANTED SYSTEM
-      // =========================
+      // ==================================================
+      // WANTED
+      // ==================================================
 
       const wanted =
         document.getElementById(
@@ -1069,9 +1326,9 @@
       }
 
 
-      // =========================
+      // ==================================================
       // RENDER
-      // =========================
+      // ==================================================
 
       renderer.render(
         scene,
@@ -1084,9 +1341,9 @@
     animate();
 
 
-    // =========================
-    // RESIZE
-    // =========================
+    // ==================================================
+    // WINDOW RESIZE
+    // ==================================================
 
     window.addEventListener(
       "resize",
