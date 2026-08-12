@@ -1,2491 +1,2924 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UK Emergency RP</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UK Emergency RP</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    html,
-    body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #87ceeb;
-    }
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #87ceeb;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-    #game {
-      width: 100vw;
-      height: 100vh;
-    }
+canvas {
+  display: block;
+}
 
-    canvas {
-      display: block;
-    }
+/* ==============================
+   TOP LEFT XP PANEL
+============================== */
 
-    /* HUD */
+#jobPanel {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  width: 205px;
+  padding: 10px 12px;
+  color: white;
+  background: rgba(10, 15, 25, 0.48);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 9px;
+  backdrop-filter: blur(7px);
+  z-index: 10;
+  font-size: 11px;
+  pointer-events: none;
+}
 
-    #hud {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      min-width: 230px;
-      padding: 15px;
-      color: white;
-      background: rgba(10, 15, 25, 0.85);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 12px;
-      z-index: 5;
-      pointer-events: none;
-    }
+#jobName {
+  font-size: 13px;
+  font-weight: 800;
+}
 
-    #hudTitle {
-      font-size: 19px;
-      font-weight: 800;
-      margin-bottom: 9px;
-    }
+#xpAmount {
+  margin-top: 3px;
+  color: #dce8ff;
+}
 
-    .hudRow {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 5px;
-      font-size: 14px;
-    }
+#xpProgress {
+  width: 100%;
+  height: 4px;
+  margin-top: 7px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.14);
+  border-radius: 5px;
+}
 
-    .hudValue {
-      font-weight: 700;
-    }
+#xpBar {
+  width: 35%;
+  height: 100%;
+  background: #4da3ff;
+}
 
-    /* WANTED */
+#xpEvent {
+  margin-top: 7px;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.9);
+}
 
-    #wanted {
-      display: none;
-      position: fixed;
-      right: 20px;
-      top: 20px;
-      padding: 12px 16px;
-      color: white;
-      background: rgba(150,0,0,0.9);
-      border-radius: 10px;
-      z-index: 5;
-      font-weight: 700;
-    }
+/* ==============================
+   SMALL CONTROLS
+============================== */
 
-    /* CONTROLS */
+#controls {
+  position: fixed;
+  left: 15px;
+  bottom: 15px;
+  padding: 7px 10px;
+  color: rgba(255,255,255,0.68);
+  background: rgba(0,0,0,0.28);
+  border-radius: 7px;
+  font-size: 10px;
+  line-height: 1.55;
+  z-index: 10;
+  pointer-events: none;
+  backdrop-filter: blur(5px);
+}
 
-    #controls {
-      position: fixed;
-      left: 20px;
-      bottom: 20px;
-      padding: 12px 16px;
-      color: white;
-      background: rgba(0,0,0,0.65);
-      border-radius: 10px;
-      font-size: 13px;
-      line-height: 1.7;
-      z-index: 5;
-      pointer-events: none;
-    }
+/* ==============================
+   INTERACTION
+============================== */
 
-    #mouseHint {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      padding: 10px 14px;
-      color: white;
-      background: rgba(0,0,0,0.6);
-      border-radius: 9px;
-      font-size: 12px;
-      z-index: 5;
-      pointer-events: none;
-    }
+#interaction {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 65px;
+  transform: translateX(-50%);
+  padding: 9px 14px;
+  color: white;
+  background: rgba(10,15,25,0.82);
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 12;
+  pointer-events: none;
+}
 
-    #crosshair {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-size: 20px;
-      font-weight: bold;
-      text-shadow: 0 1px 3px black;
-      pointer-events: none;
-      z-index: 5;
-    }
+#interactionKey {
+  display: inline-block;
+  margin-right: 7px;
+  padding: 3px 7px;
+  color: #111;
+  background: white;
+  border-radius: 5px;
+  font-weight: 900;
+}
 
-    /* INTERACTION */
+/* ==============================
+   NOTIFICATION
+============================== */
 
-    #interaction {
-      display: none;
-      position: fixed;
-      left: 50%;
-      bottom: 80px;
-      transform: translateX(-50%);
-      padding: 12px 20px;
-      color: white;
-      background: rgba(10,15,25,0.94);
-      border-radius: 10px;
-      z-index: 10;
-      pointer-events: none;
-    }
+#notification {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 9px 15px;
+  color: white;
+  background: rgba(10,15,25,0.85);
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 50;
+}
 
-    #interaction span {
-      display: inline-block;
-      margin-right: 8px;
-      padding: 5px 9px;
-      color: #111;
-      background: white;
-      border-radius: 6px;
-      font-weight: 800;
-    }
+/* ==============================
+   XP POPUP
+============================== */
 
-    /* VEHICLE MENU */
+#xpPopup {
+  position: fixed;
+  top: 125px;
+  left: 15px;
+  padding: 8px 11px;
+  color: white;
+  background: rgba(10,15,25,0.68);
+  border-radius: 7px;
+  font-size: 11px;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: 0.25s;
+  pointer-events: none;
+  z-index: 10;
+}
 
-    #vehicleMenu {
-      display: none;
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 520px;
-      max-width: 90vw;
-      max-height: 75vh;
-      overflow-y: auto;
-      padding: 24px;
-      color: white;
-      background: rgba(10,15,25,0.97);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 16px;
-      z-index: 20;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.55);
-    }
+#xpPopup.show {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-    #vehicleMenu h2 {
-      margin-top: 0;
-    }
+/* ==============================
+   WANTED
+============================== */
 
-    #vehicleMenu p {
-      color: #aab3c5;
-      font-size: 13px;
-    }
+#wanted {
+  display: none;
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  padding: 8px 12px;
+  color: white;
+  background: rgba(145,0,0,0.7);
+  border-radius: 8px;
+  font-size: 11px;
+  z-index: 10;
+}
 
-    .vehicleCard {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      margin-top: 12px;
-      padding: 14px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 10px;
-    }
+/* ==============================
+   RADIAL MENU
+============================== */
 
-    .vehicleInfo strong {
-      display: block;
-      margin-bottom: 4px;
-    }
+#radialOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.16);
+  z-index: 100;
+}
 
-    .vehicleInfo small {
-      color: #aab3c5;
-    }
+#radialMenu {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 430px;
+  height: 430px;
+  transform: translate(-50%, -50%);
+}
 
-    .vehicleButton {
-      border: none;
-      padding: 9px 14px;
-      border-radius: 8px;
-      color: white;
-      background: #2563eb;
-      cursor: pointer;
-      font-weight: 700;
-    }
+.radialCenter {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 82px;
+  height: 82px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: white;
+  background: rgba(12,18,30,0.88);
+  border: 2px solid rgba(255,255,255,0.2);
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 8px 35px rgba(0,0,0,0.4);
+}
 
-    .vehicleButton:hover {
-      background: #1d4ed8;
-    }
+.radialItem {
+  position: absolute;
+  width: 105px;
+  height: 105px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  background: rgba(12,18,30,0.78);
+  border: 2px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+  transition: 0.15s;
+  user-select: none;
+  box-shadow: 0 7px 25px rgba(0,0,0,0.28);
+}
 
-    #closeVehicleMenu {
-      width: 100%;
-      margin-top: 18px;
-      padding: 11px;
-      border: none;
-      border-radius: 9px;
-      color: white;
-      background: #333;
-      cursor: pointer;
-    }
+.radialItem:hover {
+  transform: scale(1.13);
+  background: rgba(35,105,190,0.92);
+  border-color: rgba(255,255,255,0.5);
+}
 
-    /* NOTIFICATION */
+.radialIcon {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
 
-    #notification {
-      display: none;
-      position: fixed;
-      left: 50%;
-      top: 25px;
-      transform: translateX(-50%);
-      padding: 12px 20px;
-      color: white;
-      background: rgba(10,15,25,0.95);
-      border-radius: 10px;
-      z-index: 30;
-    }
+.radialText {
+  font-size: 11px;
+  font-weight: 800;
+}
 
-    /* CHAT */
+.itemTop {
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
 
-    #chat {
-      position: fixed;
-      left: 20px;
-      bottom: 125px;
-      width: 350px;
-      max-width: calc(100vw - 40px);
-      z-index: 15;
-    }
+.itemRightTop {
+  right: 0;
+  top: 65px;
+}
 
-    #chatMessages {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      max-height: 210px;
-      overflow-y: auto;
-      padding: 8px;
-      margin-bottom: 7px;
-      background: rgba(0,0,0,0.38);
-      border-radius: 9px;
-      scrollbar-width: thin;
-    }
+.itemRightBottom {
+  right: 0;
+  bottom: 65px;
+}
 
-    .chatMessage {
-      width: fit-content;
-      max-width: 100%;
-      padding: 6px 9px;
-      color: white;
-      background: rgba(10,15,25,0.82);
-      border-radius: 7px;
-      font-size: 13px;
-      overflow-wrap: anywhere;
-    }
+.itemBottom {
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+}
 
-    .chatName {
-      font-weight: 800;
-      margin-right: 5px;
-    }
+.itemLeftBottom {
+  left: 0;
+  bottom: 65px;
+}
 
-    #chatInputArea {
-      display: flex;
-      gap: 6px;
-    }
+.itemLeftTop {
+  left: 0;
+  top: 65px;
+}
 
-    #chatInput {
-      flex: 1;
-      min-width: 0;
-      padding: 10px 12px;
-      color: white;
-      background: rgba(10,15,25,0.94);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px;
-      outline: none;
-      font-size: 13px;
-    }
+/* ==============================
+   PHONE
+============================== */
 
-    #chatInput:focus {
-      border-color: #3b82f6;
-    }
+#phone {
+  display: none;
+  position: fixed;
+  right: 35px;
+  bottom: 30px;
+  width: 285px;
+  height: 540px;
+  padding: 14px;
+  color: white;
+  background: #11151d;
+  border: 5px solid #202630;
+  border-radius: 34px;
+  z-index: 90;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+}
 
-    #chatSend {
-      padding: 10px 13px;
-      color: white;
-      background: #2563eb;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 700;
-    }
+#phoneScreen {
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  overflow-y: auto;
+  background: linear-gradient(160deg,#172235,#0b1018);
+  border-radius: 23px;
+}
 
-    #chatHint {
-      margin-top: 4px;
-      color: rgba(255,255,255,0.65);
-      font-size: 10px;
-    }
-  </style>
+#phoneHeader {
+  text-align: center;
+  font-weight: 900;
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+
+.phoneCard {
+  margin-bottom: 9px;
+  padding: 13px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 11px;
+}
+
+.phoneButton {
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px;
+  border: 0;
+  border-radius: 9px;
+  color: white;
+  background: rgba(255,255,255,0.09);
+  cursor: pointer;
+  text-align: left;
+}
+
+.phoneButton:hover {
+  background: #2563eb;
+}
+
+/* ==============================
+   VEHICLE MENU
+============================== */
+
+#vehicleMenu {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%);
+  width: 480px;
+  max-width: 90vw;
+  max-height: 75vh;
+  overflow-y: auto;
+  padding: 20px;
+  color: white;
+  background: rgba(10,15,25,0.96);
+  border-radius: 15px;
+  z-index: 80;
+}
+
+.vehicleCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 9px;
+  padding: 12px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 9px;
+}
+
+.vehicleCard strong {
+  display: block;
+  font-size: 13px;
+}
+
+.vehicleCard small {
+  color: #9faabd;
+  font-size: 10px;
+}
+
+.vehicleButton {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 7px;
+  color: white;
+  background: #2563eb;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+#closeVehicle {
+  width: 100%;
+  margin-top: 15px;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  background: #333;
+  cursor: pointer;
+}
+
+/* ==============================
+   CHAT
+============================== */
+
+#chat {
+  display: none;
+  position: fixed;
+  left: 15px;
+  bottom: 105px;
+  width: 330px;
+  z-index: 40;
+}
+
+#chatMessages {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 6px;
+}
+
+.chatMessage {
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 4px;
+  padding: 6px 8px;
+  color: white;
+  background: rgba(0,0,0,0.55);
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.chatName {
+  font-weight: 900;
+  margin-right: 5px;
+}
+
+#chatRow {
+  display: flex;
+  gap: 5px;
+}
+
+#chatInput {
+  flex: 1;
+  min-width: 0;
+  padding: 8px;
+  color: white;
+  background: rgba(0,0,0,0.65);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  outline: none;
+}
+
+#chatSend {
+  padding: 8px 10px;
+  color: white;
+  background: #2563eb;
+  border: 0;
+  border-radius: 6px;
+}
+</style>
 </head>
 
 <body>
 
-  <div id="game"></div>
+<div id="game"></div>
 
-  <div id="hud">
-    <div id="hudTitle">UK Emergency RP</div>
+<!-- TOP LEFT -->
 
-    <div class="hudRow">
-      <span>Job</span>
-      <span id="job" class="hudValue">Civilian</span>
-    </div>
+<div id="jobPanel">
 
-    <div class="hudRow">
-      <span>Money</span>
-      <span id="money" class="hudValue">£500</span>
-    </div>
-
-    <div class="hudRow">
-      <span>XP</span>
-      <span id="xp" class="hudValue">0</span>
-    </div>
+  <div id="jobName">
+    👤 CIVILIAN
   </div>
 
-  <div id="wanted">
-    🚨 WANTED
-    <span id="wantedLevel">0</span>
+  <div id="xpAmount">
+    XP 0
   </div>
 
-  <div id="crosshair">+</div>
-
-  <div id="interaction">
-    <span>E</span>
-    <b id="interactionText">Interact</b>
+  <div id="xpProgress">
+    <div id="xpBar"></div>
   </div>
 
-  <!-- CHAT -->
-
-  <div id="chat">
-
-    <div id="chatMessages"></div>
-
-    <div id="chatInputArea">
-
-      <input
-        id="chatInput"
-        type="text"
-        maxlength="200"
-        autocomplete="off"
-        placeholder="Press Enter to chat..."
-      >
-
-      <button id="chatSend">
-        Send
-      </button>
-
-    </div>
-
-    <div id="chatHint">
-      Enter = chat • Escape = close
-    </div>
-
+  <div id="xpEvent">
+    No recent activity
   </div>
 
-  <div id="controls">
-    <b>W A S D</b> Move / Drive<br>
-    <b>SHIFT</b> Sprint / Speed<br>
-    <b>E</b> Interact<br>
-    <b>ENTER</b> Chat
-  </div>
+</div>
 
-  <div id="mouseHint">
-    Hold <b>RIGHT CLICK</b> + move mouse
-  </div>
+<div id="xpPopup"></div>
 
-  <!-- VEHICLE MENU -->
+<div id="wanted">
+  🚨 WANTED LEVEL:
+  <b id="wantedLevel">0</b>
+</div>
 
-  <div id="vehicleMenu">
+<!-- CONTROLS -->
 
-    <h2>🚗 Vehicle Dealership</h2>
+<div id="controls">
+  WASD Move • SHIFT Sprint • E Interact<br>
+  TAB Radial Menu • P Phone • T Radio • RMB Camera
+</div>
 
-    <p>
-      Choose a vehicle.
-    </p>
+<!-- INTERACTION -->
 
-    <div id="vehicleList"></div>
+<div id="interaction">
+  <span id="interactionKey">E</span>
+  <span id="interactionText">Interact</span>
+</div>
 
-    <button id="closeVehicleMenu">
-      Close
+<!-- NOTIFICATION -->
+
+<div id="notification"></div>
+
+<!-- CHAT -->
+
+<div id="chat">
+
+  <div id="chatMessages"></div>
+
+  <div id="chatRow">
+
+    <input
+      id="chatInput"
+      placeholder="Type a message..."
+      maxlength="200"
+    >
+
+    <button id="chatSend">
+      Send
     </button>
 
   </div>
 
-  <div id="notification"></div>
+</div>
 
-  <script type="module">
+<!-- RADIAL MENU -->
 
-    import * as THREE from
-      "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+<div id="radialOverlay">
+
+  <div id="radialMenu">
+
+    <div class="radialCenter">
+      SELECT
+    </div>
+
+    <div
+      class="radialItem itemTop"
+      data-action="police"
+    >
+      <div class="radialIcon">🚔</div>
+      <div class="radialText">POLICE</div>
+    </div>
+
+    <div
+      class="radialItem itemRightTop"
+      data-action="ambulance"
+    >
+      <div class="radialIcon">🚑</div>
+      <div class="radialText">AMBULANCE</div>
+    </div>
+
+    <div
+      class="radialItem itemRightBottom"
+      data-action="vehicles"
+    >
+      <div class="radialIcon">🚗</div>
+      <div class="radialText">VEHICLES</div>
+    </div>
+
+    <div
+      class="radialItem itemBottom"
+      data-action="civilian"
+    >
+      <div class="radialIcon">👤</div>
+      <div class="radialText">CIVILIAN</div>
+    </div>
+
+    <div
+      class="radialItem itemLeftBottom"
+      data-action="hems"
+    >
+      <div class="radialIcon">🚁</div>
+      <div class="radialText">HEMS</div>
+    </div>
+
+    <div
+      class="radialItem itemLeftTop"
+      data-action="fire"
+    >
+      <div class="radialIcon">🚒</div>
+      <div class="radialText">FIRE</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- PHONE -->
+
+<div id="phone">
+
+  <div id="phoneScreen">
+
+    <div id="phoneHeader">
+      📱 UK RESPONSE
+    </div>
+
+    <div class="phoneCard">
+      <b id="phoneJob">Civilian</b>
+      <br>
+      <small>
+        XP: <span id="phoneXP">0</span>
+      </small>
+      <br>
+      <small>
+        Money: £<span id="phoneMoney">500</span>
+      </small>
+    </div>
+
+    <button
+      class="phoneButton"
+      onclick="openRadio()"
+    >
+      📡 Radio / Transmit
+    </button>
+
+    <button
+      class="phoneButton"
+      onclick="openVehicleMenu()"
+    >
+      🚗 Vehicles
+    </button>
+
+    <button
+      class="phoneButton"
+      onclick="showWanted()"
+    >
+      🚨 Wanted
+    </button>
+
+    <button
+      class="phoneButton"
+      onclick="showEvents()"
+    >
+      🌌 Events
+    </button>
+
+    <button
+      class="phoneButton"
+      onclick="toggleChat()"
+    >
+      💬 Chat
+    </button>
+
+    <button
+      class="phoneButton"
+      onclick="closePhone()"
+    >
+      ✕ Close Phone
+    </button>
+
+  </div>
+
+</div>
+
+<!-- VEHICLE MENU -->
+
+<div id="vehicleMenu">
+
+  <h2>🚗 Dealership</h2>
+
+  <p>
+    Select a vehicle to spawn.
+  </p>
+
+  <div id="vehicleList"></div>
+
+  <button id="closeVehicle">
+    Close
+  </button>
+
+</div>
+
+<script type="module">
+
+import * as THREE from
+"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
 
-    /* ==========================================
-       GAME SETUP
-    ========================================== */
+/* ==========================================
+   BASIC GAME
+========================================== */
 
-    const game =
-      document.getElementById("game");
+const game =
+document.getElementById("game");
 
-    const scene =
-      new THREE.Scene();
+const scene =
+new THREE.Scene();
 
-    scene.background =
-      new THREE.Color(0x87ceeb);
+scene.background =
+new THREE.Color(0x87ceeb);
 
-    const camera =
-      new THREE.PerspectiveCamera(
-        70,
-        window.innerWidth /
-        window.innerHeight,
-        0.1,
-        1000
-      );
+const camera =
+new THREE.PerspectiveCamera(
+  70,
+  innerWidth / innerHeight,
+  0.1,
+  1000
+);
 
-    const renderer =
-      new THREE.WebGLRenderer({
-        antialias: true
-      });
+const renderer =
+new THREE.WebGLRenderer({
+  antialias: true
+});
 
-    renderer.setSize(
-      window.innerWidth,
-      window.innerHeight
-    );
+renderer.setSize(
+  innerWidth,
+  innerHeight
+);
 
-    renderer.setPixelRatio(
-      Math.min(
-        window.devicePixelRatio,
-        2
-      )
-    );
+renderer.setPixelRatio(
+  Math.min(devicePixelRatio,2)
+);
 
-    renderer.shadowMap.enabled =
-      true;
+renderer.shadowMap.enabled = true;
 
-    game.appendChild(
-      renderer.domElement
-    );
+game.appendChild(renderer.domElement);
 
 
-    /* ==========================================
-       LIGHT
-    ========================================== */
+/* ==========================================
+   LIGHTING
+========================================== */
 
-    const sun =
-      new THREE.DirectionalLight(
-        0xffffff,
-        2
-      );
+const sun =
+new THREE.DirectionalLight(
+  0xffffff,
+  2
+);
 
-    sun.position.set(
-      50,
-      100,
-      50
-    );
+sun.position.set(
+  50,
+  100,
+  50
+);
 
-    sun.castShadow =
-      true;
+sun.castShadow = true;
 
-    scene.add(sun);
+scene.add(sun);
 
-    const ambient =
-      new THREE.AmbientLight(
-        0xffffff,
-        0.65
-      );
-
-    scene.add(ambient);
+scene.add(
+  new THREE.AmbientLight(
+    0xffffff,
+    0.65
+  )
+);
 
 
-    /* ==========================================
-       GROUND
-    ========================================== */
+/* ==========================================
+   GROUND
+========================================== */
 
-    const ground =
-      new THREE.Mesh(
+const ground =
+new THREE.Mesh(
+  new THREE.PlaneGeometry(
+    500,
+    500
+  ),
+  new THREE.MeshStandardMaterial({
+    color: 0x3d813d
+  })
+);
 
-        new THREE.PlaneGeometry(
-          500,
-          500
-        ),
+ground.rotation.x =
+-Math.PI / 2;
 
-        new THREE.MeshStandardMaterial({
-          color: 0x3d813d
-        })
+ground.receiveShadow = true;
 
-      );
-
-    ground.rotation.x =
-      -Math.PI / 2;
-
-    ground.receiveShadow =
-      true;
-
-    scene.add(ground);
+scene.add(ground);
 
 
-    /* ==========================================
-       ROAD
-    ========================================== */
+/* ==========================================
+   ROADS
+========================================== */
 
-    const road =
-      new THREE.Mesh(
+const road =
+new THREE.Mesh(
+  new THREE.BoxGeometry(
+    30,
+    0.1,
+    500
+  ),
+  new THREE.MeshStandardMaterial({
+    color: 0x303030
+  })
+);
 
-        new THREE.BoxGeometry(
-          30,
-          0.1,
-          500
-        ),
+road.position.y = 0.05;
 
-        new THREE.MeshStandardMaterial({
-          color: 0x303030
-        })
-
-      );
-
-    road.position.y =
-      0.05;
-
-    scene.add(road);
+scene.add(road);
 
 
-    /* ==========================================
-       ROAD MARKINGS
-    ========================================== */
+for (
+  let z = -240;
+  z <= 240;
+  z += 10
+) {
+
+  const line =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      0.2,
+      0.04,
+      5
+    ),
+    new THREE.MeshStandardMaterial({
+      color: 0xffffff
+    })
+  );
+
+  line.position.set(
+    0,
+    0.12,
+    z
+  );
+
+  scene.add(line);
+
+}
+
+
+/* ==========================================
+   BUILDINGS
+========================================== */
+
+function createBuilding(
+  x,
+  z,
+  width,
+  depth,
+  height,
+  color
+) {
+
+  const building =
+  new THREE.Group();
+
+  building.position.set(
+    x,
+    0,
+    z
+  );
+
+  const body =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      width,
+      height,
+      depth
+    ),
+    new THREE.MeshStandardMaterial({
+      color
+    })
+  );
+
+  body.position.y =
+  height / 2;
+
+  building.add(body);
+
+
+  const windowMaterial =
+  new THREE.MeshStandardMaterial({
+    color: 0x62a9c7,
+    roughness: 0.2,
+    metalness: 0.1
+  });
+
+
+  for (
+    let wx = -width/2 + 1;
+    wx < width/2;
+    wx += 2
+  ) {
 
     for (
-      let z = -240;
-      z <= 240;
-      z += 10
-    ) {
-
-      const line =
-        new THREE.Mesh(
-
-          new THREE.BoxGeometry(
-            0.22,
-            0.04,
-            5
-          ),
-
-          new THREE.MeshStandardMaterial({
-            color: 0xffffff
-          })
-
-        );
-
-      line.position.set(
-        0,
-        0.12,
-        z
-      );
-
-      scene.add(line);
-
-    }
-
-
-    /* ==========================================
-       CHARACTER
-    ========================================== */
-
-    function createCharacter() {
-
-      const character =
-        new THREE.Group();
-
-
-      const legMaterial =
-        new THREE.MeshStandardMaterial({
-          color: 0x202020
-        });
-
-
-      const leftLeg =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            0.35,
-            1,
-            0.35
-          ),
-          legMaterial
-        );
-
-      leftLeg.position.set(
-        -0.22,
-        0.5,
-        0
-      );
-
-      character.add(
-        leftLeg
-      );
-
-
-      const rightLeg =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            0.35,
-            1,
-            0.35
-          ),
-          legMaterial
-        );
-
-      rightLeg.position.set(
-        0.22,
-        0.5,
-        0
-      );
-
-      character.add(
-        rightLeg
-      );
-
-
-      const body =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            0.9,
-            1.15,
-            0.5
-          ),
-          new THREE.MeshStandardMaterial({
-            color: 0x2455a6
-          })
-        );
-
-      body.position.y =
-        1.45;
-
-      character.add(
-        body
-      );
-
-
-      const head =
-        new THREE.Mesh(
-          new THREE.SphereGeometry(
-            0.38,
-            20,
-            20
-          ),
-          new THREE.MeshStandardMaterial({
-            color: 0xf0bd91
-          })
-        );
-
-      head.position.y =
-        2.3;
-
-      character.add(
-        head
-      );
-
-
-      const armMaterial =
-        new THREE.MeshStandardMaterial({
-          color: 0x2455a6
-        });
-
-
-      const leftArm =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            0.3,
-            1,
-            0.3
-          ),
-          armMaterial
-        );
-
-      leftArm.position.set(
-        -0.62,
-        1.45,
-        0
-      );
-
-      character.add(
-        leftArm
-      );
-
-
-      const rightArm =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            0.3,
-            1,
-            0.3
-          ),
-          armMaterial
-        );
-
-      rightArm.position.set(
-        0.62,
-        1.45,
-        0
-      );
-
-      character.add(
-        rightArm
-      );
-
-
-      character.userData = {
-
-        job: "Civilian",
-
-        money: 500,
-
-        xp: 0,
-
-        wantedLevel: 0,
-
-        inVehicle: false,
-
-        vehicle: null
-
-      };
-
-
-      return character;
-
-    }
-
-
-    const player =
-      createCharacter();
-
-    player.position.set(
-      0,
-      0,
-      10
-    );
-
-    scene.add(player);
-
-
-    /* ==========================================
-       CAMERA
-    ========================================== */
-
-    let cameraYaw =
-      0;
-
-    let cameraPitch =
-      0.25;
-
-    let rightMouseDown =
-      false;
-
-    const mouseSensitivity =
-      0.004;
-
-
-    /* ==========================================
-       KEYBOARD
-    ========================================== */
-
-    const keys = {};
-
-
-    window.addEventListener(
-      "keydown",
-      event => {
-
-        const key =
-          event.key.toLowerCase();
-
-
-        if (
-          document.activeElement ===
-          chatInput
-        ) {
-
-          if (
-            key === "escape"
-          ) {
-
-            chatInput.blur();
-
-          }
-
-          return;
-
-        }
-
-
-        keys[key] =
-          true;
-
-
-        if (
-          key === "e"
-        ) {
-
-          handleInteraction();
-
-        }
-
-
-        if (
-          key === "enter"
-        ) {
-
-          openChat();
-
-        }
-
-      }
-    );
-
-
-    window.addEventListener(
-      "keyup",
-      event => {
-
-        keys[
-          event.key.toLowerCase()
-        ] = false;
-
-      }
-    );
-
-
-    /* ==========================================
-       CAMERA MOUSE
-    ========================================== */
-
-    renderer.domElement.addEventListener(
-      "contextmenu",
-      event => {
-
-        event.preventDefault();
-
-      }
-    );
-
-
-    renderer.domElement.addEventListener(
-      "mousedown",
-      event => {
-
-        if (
-          event.button === 2
-        ) {
-
-          rightMouseDown =
-            true;
-
-        }
-
-      }
-    );
-
-
-    window.addEventListener(
-      "mouseup",
-      event => {
-
-        if (
-          event.button === 2
-        ) {
-
-          rightMouseDown =
-            false;
-
-        }
-
-      }
-    );
-
-
-    window.addEventListener(
-      "mousemove",
-      event => {
-
-        if (
-          !rightMouseDown
-        ) {
-
-          return;
-
-        }
-
-
-        cameraYaw -=
-          event.movementX *
-          mouseSensitivity;
-
-
-        cameraPitch -=
-          event.movementY *
-          mouseSensitivity;
-
-
-        cameraPitch =
-          THREE.MathUtils.clamp(
-            cameraPitch,
-            -0.45,
-            0.8
-          );
-
-      }
-    );
-
-
-    /* ==========================================
-       VEHICLES
-    ========================================== */
-
-    const vehicles = [
-
-      {
-        id: "hatchback",
-        name: "UK Hatchback",
-        price: 0,
-        type: "Civilian",
-        color: 0xffffff
-      },
-
-      {
-        id: "saloon",
-        name: "UK Saloon",
-        price: 2500,
-        type: "Civilian",
-        color: 0x222222
-      },
-
-      {
-        id: "suv",
-        name: "UK SUV",
-        price: 5000,
-        type: "Civilian",
-        color: 0x555555
-      },
-
-      {
-        id: "police",
-        name: "Police Response",
-        price: 15000,
-        type: "Police",
-        color: 0x111111,
-        emergency: true
-      },
-
-      {
-        id: "fire",
-        name: "Fire Engine",
-        price: 30000,
-        type: "Fire",
-        color: 0xcc2222,
-        emergency: true
-      },
-
-      {
-        id: "ambulance",
-        name: "Ambulance",
-        price: 25000,
-        type: "Ambulance",
-        color: 0xffffff,
-        emergency: true
-      },
-
-      {
-        id: "hems",
-        name: "HEMS Response",
-        price: 50000,
-        type: "HEMS",
-        color: 0xffff00,
-        emergency: true
-      }
-
-    ];
-
-
-    let currentVehicle =
-      null;
-
-    let currentVehicleData =
-      null;
-
-    let inVehicle =
-      false;
-
-
-    /* ==========================================
-       CREATE VEHICLE
-    ========================================== */
-
-    function createVehicle(data) {
-
-      const vehicle =
-        new THREE.Group();
-
-
-      const body =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            2.2,
-            0.7,
-            4.2
-          ),
-          new THREE.MeshStandardMaterial({
-            color: data.color
-          })
-        );
-
-      body.position.y =
-        0.9;
-
-      body.castShadow =
-        true;
-
-      vehicle.add(body);
-
-
-      const cabin =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            1.7,
-            0.7,
-            2
-          ),
-          new THREE.MeshStandardMaterial({
-            color: data.color
-          })
-        );
-
-      cabin.position.y =
-        1.55;
-
-      vehicle.add(cabin);
-
-
-      const glass =
-        new THREE.MeshStandardMaterial({
-          color: 0x6098b5,
-          metalness: 0.2,
-          roughness: 0.2
-        });
-
-
-      const frontWindow =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            1.4,
-            0.45,
-            0.08
-          ),
-          glass
-        );
-
-      frontWindow.position.set(
-        0,
-        1.58,
-        1.04
-      );
-
-      vehicle.add(
-        frontWindow
-      );
-
-
-      const rearWindow =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            1.4,
-            0.45,
-            0.08
-          ),
-          glass
-        );
-
-      rearWindow.position.set(
-        0,
-        1.58,
-        -1.04
-      );
-
-      vehicle.add(
-        rearWindow
-      );
-
-
-      const wheelPositions = [
-
-        [-1.12, 0.55, 1.3],
-
-        [1.12, 0.55, 1.3],
-
-        [-1.12, 0.55, -1.3],
-
-        [1.12, 0.55, -1.3]
-
-      ];
-
-
-      for (
-        const pos of wheelPositions
-      ) {
-
-        const wheel =
-          new THREE.Mesh(
-            new THREE.CylinderGeometry(
-              0.42,
-              0.42,
-              0.3,
-              20
-            ),
-            new THREE.MeshStandardMaterial({
-              color: 0x111111
-            })
-          );
-
-        wheel.rotation.z =
-          Math.PI / 2;
-
-        wheel.position.set(
-          pos[0],
-          pos[1],
-          pos[2]
-        );
-
-        vehicle.add(wheel);
-
-      }
-
-
-      /* EMERGENCY LIGHTBAR */
-
-      if (
-        data.emergency
-      ) {
-
-        const lightBar =
-          new THREE.Mesh(
-            new THREE.BoxGeometry(
-              1.3,
-              0.16,
-              0.35
-            ),
-            new THREE.MeshStandardMaterial({
-              color: 0x004cff,
-              emissive: 0x003cff,
-              emissiveIntensity: 2
-            })
-          );
-
-        lightBar.position.y =
-          2;
-
-        vehicle.add(
-          lightBar
-        );
-
-      }
-
-
-      vehicle.userData = {
-
-        speed: 0,
-
-        maxSpeed:
-          data.type === "Fire"
-            ? 12
-            : 20,
-
-        acceleration: 10,
-
-        braking: 15,
-
-        steering: 2.2,
-
-        data: data
-
-      };
-
-
-      return vehicle;
-
-    }
-
-
-    /* ==========================================
-       DEALERSHIP
-    ========================================== */
-
-    const dealership =
-      new THREE.Group();
-
-    dealership.position.set(
-      8,
-      0,
-      0
-    );
-
-    scene.add(
-      dealership
-    );
-
-
-    const dealershipBuilding =
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          10,
-          6,
-          10
-        ),
-        new THREE.MeshStandardMaterial({
-          color: 0x777777
-        })
-      );
-
-    dealershipBuilding.position.y =
-      3;
-
-    dealership.add(
-      dealershipBuilding
-    );
-
-
-    const buildingGlass =
-      new THREE.MeshStandardMaterial({
-        color: 0x4b9ac0
-      });
-
-
-    for (
-      let x = -3;
-      x <= 3;
-      x += 2
+      let wy = 1.5;
+      wy < height - 0.5;
+      wy += 2
     ) {
 
       const window =
-        new THREE.Mesh(
-          new THREE.BoxGeometry(
-            1.4,
-            1.8,
-            0.08
-          ),
-          buildingGlass
-        );
+      new THREE.Mesh(
+        new THREE.BoxGeometry(
+          0.9,
+          0.9,
+          0.08
+        ),
+        windowMaterial
+      );
 
       window.position.set(
-        x,
-        3,
-        5.05
+        wx,
+        wy,
+        depth/2 + 0.05
       );
 
-      dealership.add(
-        window
-      );
+      building.add(window);
+
+    }
+
+  }
+
+  scene.add(building);
+
+  return building;
+
+}
+
+
+createBuilding(
+  -25,
+  -20,
+  16,
+  14,
+  10,
+  0x777777
+);
+
+createBuilding(
+  25,
+  -35,
+  20,
+  16,
+  12,
+  0x8a6f55
+);
+
+createBuilding(
+  -28,
+  25,
+  14,
+  14,
+  8,
+  0x666f78
+);
+
+
+/* ==========================================
+   CHARACTER
+========================================== */
+
+function createCharacter() {
+
+  const group =
+  new THREE.Group();
+
+
+  const dark =
+  new THREE.MeshStandardMaterial({
+    color: 0x202020
+  });
+
+
+  const shirt =
+  new THREE.MeshStandardMaterial({
+    color: 0x2455a6
+  });
+
+
+  const skin =
+  new THREE.MeshStandardMaterial({
+    color: 0xf0bd91
+  });
+
+
+  const leg1 =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      0.35,
+      1,
+      0.35
+    ),
+    dark
+  );
+
+  leg1.position.set(
+    -0.22,
+    0.5,
+    0
+  );
+
+  group.add(leg1);
+
+
+  const leg2 =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      0.35,
+      1,
+      0.35
+    ),
+    dark
+  );
+
+  leg2.position.set(
+    0.22,
+    0.5,
+    0
+  );
+
+  group.add(leg2);
+
+
+  const body =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      0.9,
+      1.15,
+      0.5
+    ),
+    shirt
+  );
+
+  body.position.y = 1.45;
+
+  group.add(body);
+
+
+  const head =
+  new THREE.Mesh(
+    new THREE.SphereGeometry(
+      0.38,
+      20,
+      20
+    ),
+    skin
+  );
+
+  head.position.y = 2.3;
+
+  group.add(head);
+
+
+  const arm1 =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      0.3,
+      1,
+      0.3
+    ),
+    shirt
+  );
+
+  arm1.position.set(
+    -0.62,
+    1.45,
+    0
+  );
+
+  group.add(arm1);
+
+
+  const arm2 =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      0.3,
+      1,
+      0.3
+    ),
+    shirt
+  );
+
+  arm2.position.set(
+    0.62,
+    1.45,
+    0
+  );
+
+  group.add(arm2);
+
+
+  return group;
+
+}
+
+
+const player =
+createCharacter();
+
+player.position.set(
+  0,
+  0,
+  10
+);
+
+scene.add(player);
+
+
+/* ==========================================
+   PLAYER DATA
+========================================== */
+
+const playerData = {
+
+  job: "Civilian",
+
+  xp: 0,
+
+  money: 500,
+
+  level: 1,
+
+  wanted: 0
+
+};
+
+
+/* ==========================================
+   KEYS
+========================================== */
+
+const keys = {};
+
+window.addEventListener(
+  "keydown",
+  event => {
+
+    const key =
+    event.key.toLowerCase();
+
+
+    if (
+      key === "tab"
+    ) {
+
+      event.preventDefault();
+
+      openRadial();
+
+      return;
 
     }
 
 
-    /* ==========================================
-       VEHICLE MENU
-    ========================================== */
+    if (
+      key === "p"
+    ) {
 
-    const vehicleMenu =
-      document.getElementById(
-        "vehicleMenu"
-      );
+      togglePhone();
 
-    const vehicleList =
-      document.getElementById(
-        "vehicleList"
-      );
-
-
-    function openVehicleMenu() {
-
-      vehicleList.innerHTML =
-        "";
-
-
-      for (
-        const vehicle of vehicles
-      ) {
-
-        const card =
-          document.createElement(
-            "div"
-          );
-
-        card.className =
-          "vehicleCard";
-
-
-        const info =
-          document.createElement(
-            "div"
-          );
-
-        info.className =
-          "vehicleInfo";
-
-
-        const title =
-          document.createElement(
-            "strong"
-          );
-
-        title.textContent =
-          vehicle.name;
-
-
-        const description =
-          document.createElement(
-            "small"
-          );
-
-        description.textContent =
-          vehicle.type +
-          " • £" +
-          vehicle.price.toLocaleString();
-
-
-        info.appendChild(
-          title
-        );
-
-        info.appendChild(
-          description
-        );
-
-
-        const button =
-          document.createElement(
-            "button"
-          );
-
-        button.className =
-          "vehicleButton";
-
-        button.textContent =
-          vehicle.price === 0
-            ? "Spawn"
-            : "Buy";
-
-
-        button.onclick =
-          () => {
-
-            spawnVehicle(
-              vehicle
-            );
-
-          };
-
-
-        card.appendChild(
-          info
-        );
-
-        card.appendChild(
-          button
-        );
-
-        vehicleList.appendChild(
-          card
-        );
-
-      }
-
-
-      vehicleMenu.style.display =
-        "block";
+      return;
 
     }
 
 
-    document
-      .getElementById(
-        "closeVehicleMenu"
-      )
-      .onclick =
-      () => {
+    if (
+      key === "t" &&
+      playerData.job !== "Civilian"
+    ) {
 
-        vehicleMenu.style.display =
-          "none";
+      openRadio();
 
-      };
-
-
-    /* ==========================================
-       NOTIFICATION
-    ========================================== */
-
-    function notify(message) {
-
-      const notification =
-        document.getElementById(
-          "notification"
-        );
-
-
-      notification.textContent =
-        message;
-
-
-      notification.style.display =
-        "block";
-
-
-      setTimeout(
-        () => {
-
-          notification.style.display =
-            "none";
-
-        },
-        2200
-      );
+      return;
 
     }
 
 
-    /* ==========================================
-       SPAWN VEHICLE
-    ========================================== */
+    if (
+      key === "enter"
+    ) {
 
-    function spawnVehicle(data) {
+      openChat();
 
-      if (
-        currentVehicle
-      ) {
-
-        scene.remove(
-          currentVehicle
-        );
-
-        currentVehicle =
-          null;
-
-      }
-
-
-      if (
-        player.userData.money <
-        data.price
-      ) {
-
-        notify(
-          "You don't have enough money."
-        );
-
-        return;
-
-      }
-
-
-      player.userData.money -=
-        data.price;
-
-
-      currentVehicle =
-        createVehicle(data);
-
-
-      currentVehicle.position.set(
-        player.position.x + 4,
-        0,
-        player.position.z
-      );
-
-
-      currentVehicle.rotation.y =
-        player.rotation.y;
-
-
-      currentVehicleData =
-        data;
-
-
-      scene.add(
-        currentVehicle
-      );
-
-
-      vehicleMenu.style.display =
-        "none";
-
-
-      notify(
-        data.name +
-        " spawned!"
-      );
+      return;
 
     }
 
 
-    /* ==========================================
-       ENTER VEHICLE
-    ========================================== */
+    if (
+      key === "e"
+    ) {
 
-    function enterVehicle() {
-
-      if (
-        !currentVehicle
-      ) {
-
-        return;
-
-      }
-
-
-      const distance =
-        player.position.distanceTo(
-          currentVehicle.position
-        );
-
-
-      if (
-        distance > 5
-      ) {
-
-        return;
-
-      }
-
-
-      inVehicle =
-        true;
-
-
-      player.userData.inVehicle =
-        true;
-
-
-      player.userData.vehicle =
-        currentVehicle;
-
-
-      player.visible =
-        false;
-
-
-      notify(
-        "Entered " +
-        currentVehicleData.name
-      );
+      handleInteraction();
 
     }
 
 
-    /* ==========================================
-       EXIT VEHICLE
-    ========================================== */
+    keys[key] = true;
 
-    function exitVehicle() {
-
-      if (
-        !currentVehicle
-      ) {
-
-        return;
-
-      }
+  }
+);
 
 
-      inVehicle =
-        false;
+window.addEventListener(
+  "keyup",
+  event => {
+
+    keys[
+      event.key.toLowerCase()
+    ] = false;
+
+  }
+);
 
 
-      player.userData.inVehicle =
-        false;
+/* ==========================================
+   RIGHT CLICK CAMERA
+========================================== */
+
+let rightMouse =
+false;
+
+let yaw = 0;
+
+let pitch = 0.25;
 
 
-      player.userData.vehicle =
-        null;
+renderer.domElement.addEventListener(
+  "contextmenu",
+  e => e.preventDefault()
+);
 
 
-      player.visible =
-        true;
+renderer.domElement.addEventListener(
+  "mousedown",
+  e => {
 
+    if (
+      e.button === 2
+    ) {
 
-      player.position.set(
-        currentVehicle.position.x + 3,
-        0,
-        currentVehicle.position.z
-      );
-
-
-      notify(
-        "Exited vehicle."
-      );
-
-    }
-
-
-    /* ==========================================
-       E INTERACTION
-    ========================================== */
-
-    function handleInteraction() {
-
-      if (
-        vehicleMenu.style.display ===
-        "block"
-      ) {
-
-        return;
-
-      }
-
-
-      if (
-        inVehicle
-      ) {
-
-        exitVehicle();
-
-        return;
-
-      }
-
-
-      if (
-        currentVehicle
-      ) {
-
-        const distance =
-          player.position.distanceTo(
-            currentVehicle.position
-          );
-
-
-        if (
-          distance < 5
-        ) {
-
-          enterVehicle();
-
-          return;
-
-        }
-
-      }
-
-
-      const dealershipDistance =
-        player.position.distanceTo(
-          dealership.position
-        );
-
-
-      if (
-        dealershipDistance < 12
-      ) {
-
-        openVehicleMenu();
-
-        return;
-
-      }
-
-
-      notify(
-        "Nothing to interact with here."
-      );
+      rightMouse = true;
 
     }
 
-
-    /* ==========================================
-       WALKING
-       A = LEFT
-       D = RIGHT
-    ========================================== */
-
-    function updateWalking(delta) {
-
-      let forward =
-        0;
-
-      let sideways =
-        0;
+  }
+);
 
 
-      if (
-        keys["w"]
-      ) {
+window.addEventListener(
+  "mouseup",
+  e => {
 
-        forward += 1;
+    if (
+      e.button === 2
+    ) {
 
-      }
-
-
-      if (
-        keys["s"]
-      ) {
-
-        forward -= 1;
-
-      }
-
-
-      /* A IS LEFT */
-
-      if (
-        keys["a"]
-      ) {
-
-        sideways -= 1;
-
-      }
-
-
-      /* D IS RIGHT */
-
-      if (
-        keys["d"]
-      ) {
-
-        sideways += 1;
-
-      }
-
-
-      if (
-        forward === 0 &&
-        sideways === 0
-      ) {
-
-        return;
-
-      }
-
-
-      const speed =
-        keys["shift"]
-          ? 11
-          : 6;
-
-
-      const length =
-        Math.sqrt(
-          forward * forward +
-          sideways * sideways
-        );
-
-
-      forward /=
-        length;
-
-      sideways /=
-        length;
-
-
-      const forwardX =
-        Math.sin(
-          cameraYaw
-        );
-
-      const forwardZ =
-        Math.cos(
-          cameraYaw
-        );
-
-
-      const rightX =
-        Math.cos(
-          cameraYaw
-        );
-
-      const rightZ =
-        -Math.sin(
-          cameraYaw
-        );
-
-
-      const moveX =
-        forwardX * forward +
-        rightX * sideways;
-
-
-      const moveZ =
-        forwardZ * forward +
-        rightZ * sideways;
-
-
-      player.position.x +=
-        moveX *
-        speed *
-        delta;
-
-
-      player.position.z +=
-        moveZ *
-        speed *
-        delta;
-
-
-      const targetRotation =
-        Math.atan2(
-          moveX,
-          moveZ
-        );
-
-
-      let difference =
-        targetRotation -
-        player.rotation.y;
-
-
-      difference =
-        Math.atan2(
-          Math.sin(difference),
-          Math.cos(difference)
-        );
-
-
-      player.rotation.y +=
-        difference *
-        Math.min(
-          1,
-          delta * 12
-        );
+      rightMouse = false;
 
     }
 
+  }
+);
 
-    /* ==========================================
-       DRIVING
-       A = LEFT
-       D = RIGHT
-    ========================================== */
 
-    function updateDriving(delta) {
+window.addEventListener(
+  "mousemove",
+  e => {
 
-      if (
-        !currentVehicle
-      ) {
+    if (!rightMouse)
+      return;
 
-        return;
+    yaw -=
+    e.movementX * 0.004;
 
-      }
+    pitch -=
+    e.movementY * 0.004;
 
+    pitch =
+    THREE.MathUtils.clamp(
+      pitch,
+      -0.45,
+      0.8
+    );
 
-      const data =
-        currentVehicle.userData;
+  }
+);
 
 
-      let acceleration =
-        0;
+/* ==========================================
+   RADIAL MENU
+========================================== */
 
+const radialOverlay =
+document.getElementById(
+  "radialOverlay"
+);
 
-      if (
-        keys["w"]
-      ) {
 
-        acceleration =
-          1;
+function openRadial() {
 
-      }
+  radialOverlay.style.display =
+  "block";
 
+}
 
-      if (
-        keys["s"]
-      ) {
 
-        acceleration =
-          -1;
+function closeRadial() {
 
-      }
+  radialOverlay.style.display =
+  "none";
 
+}
 
-      if (
-        acceleration !== 0
-      ) {
 
-        data.speed +=
-          acceleration *
-          data.acceleration *
-          delta;
+document
+.querySelectorAll(".radialItem")
+.forEach(item => {
 
-      } else {
+  item.addEventListener(
+    "click",
+    () => {
 
-        if (
-          data.speed > 0
-        ) {
+      const action =
+      item.dataset.action;
 
-          data.speed -=
-            data.braking *
-            delta;
+      closeRadial();
 
-        }
-
-
-        if (
-          data.speed < 0
-        ) {
-
-          data.speed +=
-            data.braking *
-            delta;
-
-        }
-
-      }
-
-
-      const maxSpeed =
-        keys["shift"]
-          ? data.maxSpeed * 1.5
-          : data.maxSpeed;
-
-
-      data.speed =
-        THREE.MathUtils.clamp(
-          data.speed,
-          -maxSpeed / 2,
-          maxSpeed
-        );
-
-
-      let steering =
-        0;
-
-
-      /* A = LEFT */
-
-      if (
-        keys["a"]
-      ) {
-
-        steering =
-          1;
-
-      }
-
-
-      /* D = RIGHT */
-
-      if (
-        keys["d"]
-      ) {
-
-        steering =
-          -1;
-
-      }
-
-
-      if (
-        Math.abs(data.speed) > 0.1
-      ) {
-
-        currentVehicle.rotation.y +=
-          steering *
-          data.steering *
-          delta *
-          (
-            data.speed /
-            maxSpeed
-          );
-
-      }
-
-
-      currentVehicle.translateZ(
-        data.speed *
-        delta
-      );
-
-
-      player.position.copy(
-        currentVehicle.position
-      );
-
-
-      player.position.y =
-        0;
-
-
-      player.rotation.y =
-        currentVehicle.rotation.y;
-
-    }
-
-
-    /* ==========================================
-       CAMERA
-    ========================================== */
-
-    function updateCamera(delta) {
-
-      const target =
-        inVehicle &&
-        currentVehicle
-
-          ? new THREE.Vector3(
-              currentVehicle.position.x,
-              1.5,
-              currentVehicle.position.z
-            )
-
-          : new THREE.Vector3(
-              player.position.x,
-              1.5,
-              player.position.z
-            );
-
-
-      const distance =
-        inVehicle
-          ? 11
-          : 9;
-
-
-      const horizontal =
-        Math.cos(cameraPitch) *
-        distance;
-
-
-      const vertical =
-        Math.sin(cameraPitch) *
-        distance;
-
-
-      const cameraX =
-        target.x -
-        Math.sin(cameraYaw) *
-        horizontal;
-
-
-      const cameraZ =
-        target.z -
-        Math.cos(cameraYaw) *
-        horizontal;
-
-
-      const desired =
-        new THREE.Vector3(
-          cameraX,
-          target.y +
-            3.2 +
-            vertical,
-          cameraZ
-        );
-
-
-      const smoothing =
-        1 -
-        Math.pow(
-          0.001,
-          delta
-        );
-
-
-      camera.position.lerp(
-        desired,
-        smoothing
-      );
-
-
-      camera.lookAt(
-        target
+      selectRadialAction(
+        action
       );
 
     }
+  );
+
+});
 
 
-    /* ==========================================
-       INTERACTION UI
-    ========================================== */
+function selectRadialAction(
+  action
+) {
 
-    function updateInteraction() {
+  if (
+    action === "police"
+  ) {
 
-      const interaction =
-        document.getElementById(
-          "interaction"
-        );
+    setJob("Police");
 
+  }
 
-      if (
-        inVehicle
-      ) {
+  else if (
+    action === "fire"
+  ) {
 
-        interaction.style.display =
-          "block";
+    setJob(
+      "Fire & Rescue"
+    );
 
+  }
 
-        document.getElementById(
-          "interactionText"
-        ).textContent =
-          "Exit Vehicle";
+  else if (
+    action === "ambulance"
+  ) {
 
+    setJob(
+      "Ambulance"
+    );
 
-        return;
+  }
 
-      }
+  else if (
+    action === "hems"
+  ) {
 
+    setJob("HEMS");
 
-      if (
-        currentVehicle
-      ) {
+  }
 
-        const distance =
-          player.position.distanceTo(
-            currentVehicle.position
-          );
+  else if (
+    action === "civilian"
+  ) {
 
+    setJob("Civilian");
 
-        if (
-          distance < 5
-        ) {
+  }
 
-          interaction.style.display =
-            "block";
+  else if (
+    action === "vehicles"
+  ) {
 
+    openVehicleMenu();
 
-          document.getElementById(
-            "interactionText"
-          ).textContent =
-            "Enter Vehicle";
+  }
 
-
-          return;
-
-        }
-
-      }
+}
 
 
-      const dealershipDistance =
-        player.position.distanceTo(
-          dealership.position
-        );
+/* ==========================================
+   JOB SYSTEM
+========================================== */
+
+function setJob(
+  job
+) {
+
+  playerData.job =
+  job;
 
 
-      if (
-        dealershipDistance < 12
-      ) {
-
-        interaction.style.display =
-          "block";
-
-
-        document.getElementById(
-          "interactionText"
-        ).textContent =
-          "Open Dealership";
+  document.getElementById(
+    "jobName"
+  ).textContent =
+  getJobIcon(job) +
+  " " +
+  job.toUpperCase();
 
 
-        return;
+  notify(
+    "You joined " +
+    job
+  );
 
-      }
+
+  addXP(
+    25,
+    "Joined " + job
+  );
+
+}
 
 
-      interaction.style.display =
-        "none";
+function getJobIcon(job) {
+
+  if (
+    job === "Police"
+  )
+    return "🚔";
+
+  if (
+    job === "Fire & Rescue"
+  )
+    return "🚒";
+
+  if (
+    job === "Ambulance"
+  )
+    return "🚑";
+
+  if (
+    job === "HEMS"
+  )
+    return "🚁";
+
+  return "👤";
+
+}
+
+
+/* ==========================================
+   XP SYSTEM
+========================================== */
+
+function addXP(
+  amount,
+  reason,
+  money = 0
+) {
+
+  playerData.xp +=
+  amount;
+
+  playerData.money +=
+  money;
+
+
+  const previousLevel =
+  playerData.level;
+
+
+  playerData.level =
+  Math.floor(
+    playerData.xp / 1000
+  ) + 1;
+
+
+  const xpEvent =
+  document.getElementById(
+    "xpEvent"
+  );
+
+
+  xpEvent.innerHTML =
+  `<b>+${amount} XP</b> ${reason}` +
+  (
+    money
+      ? `<br><b>+£${money}</b> reward`
+      : ""
+  );
+
+
+  const popup =
+  document.getElementById(
+    "xpPopup"
+  );
+
+
+  popup.innerHTML =
+  `+${amount} XP — ${reason}` +
+  (
+    money
+      ? ` • +£${money}`
+      : ""
+  );
+
+
+  popup.classList.add(
+    "show"
+  );
+
+
+  setTimeout(
+    () => {
+
+      popup.classList.remove(
+        "show"
+      );
+
+    },
+    2500
+  );
+
+
+  if (
+    playerData.level >
+    previousLevel
+  ) {
+
+    notify(
+      "⭐ LEVEL UP! Level " +
+      playerData.level
+    );
+
+  }
+
+
+  updateHUD();
+
+}
+
+
+/* ==========================================
+   WANTED
+========================================== */
+
+function setWanted(
+  level
+) {
+
+  playerData.wanted =
+  Math.max(
+    0,
+    Math.min(5,level)
+  );
+
+
+  updateHUD();
+
+}
+
+
+function showWanted() {
+
+  notify(
+    "Wanted level: " +
+    playerData.wanted
+  );
+
+}
+
+
+/* ==========================================
+   HUD
+========================================== */
+
+function updateHUD() {
+
+  document.getElementById(
+    "xpAmount"
+  ).textContent =
+  "XP " +
+  playerData.xp.toLocaleString();
+
+
+  const progress =
+  playerData.xp % 1000;
+
+
+  document.getElementById(
+    "xpBar"
+  ).style.width =
+  (progress / 10) +
+  "%";
+
+
+  document.getElementById(
+    "phoneJob"
+  ).textContent =
+  getJobIcon(
+    playerData.job
+  ) +
+  " " +
+  playerData.job;
+
+
+  document.getElementById(
+    "phoneXP"
+  ).textContent =
+  playerData.xp.toLocaleString();
+
+
+  document.getElementById(
+    "phoneMoney"
+  ).textContent =
+  playerData.money.toLocaleString();
+
+
+  document.getElementById(
+    "wantedLevel"
+  ).textContent =
+  playerData.wanted;
+
+
+  document.getElementById(
+    "wanted"
+  ).style.display =
+  playerData.wanted > 0
+    ? "block"
+    : "none";
+
+}
+
+
+/* ==========================================
+   PHONE
+========================================== */
+
+const phone =
+document.getElementById(
+  "phone"
+);
+
+
+function togglePhone() {
+
+  phone.style.display =
+  phone.style.display === "block"
+    ? "none"
+    : "block";
+
+}
+
+
+function closePhone() {
+
+  phone.style.display =
+  "none";
+
+}
+
+
+function showEvents() {
+
+  notify(
+    "No active events."
+  );
+
+}
+
+
+function openRadio() {
+
+  if (
+    playerData.job ===
+    "Civilian"
+  ) {
+
+    notify(
+      "Join an emergency job first."
+    );
+
+    return;
+
+  }
+
+
+  closePhone();
+
+  notify(
+    "📡 Radio opened — T"
+  );
+
+}
+
+
+function toggleChat() {
+
+  document.getElementById(
+    "chat"
+  ).style.display =
+  "block";
+
+}
+
+
+/* ==========================================
+   CHAT
+========================================== */
+
+const chatInput =
+document.getElementById(
+  "chatInput"
+);
+
+
+function openChat() {
+
+  document.getElementById(
+    "chat"
+  ).style.display =
+  "block";
+
+  chatInput.focus();
+
+}
+
+
+function sendChat() {
+
+  const text =
+  chatInput.value.trim();
+
+  if (!text)
+    return;
+
+
+  addChatMessage(
+    "You",
+    text
+  );
+
+
+  chatInput.value =
+  "";
+
+}
+
+
+function addChatMessage(
+  name,
+  text
+) {
+
+  const message =
+  document.createElement(
+    "div"
+  );
+
+  message.className =
+  "chatMessage";
+
+
+  message.innerHTML =
+  `<span class="chatName">${escapeHTML(name)}:</span>${escapeHTML(text)}`;
+
+
+  document.getElementById(
+    "chatMessages"
+  ).appendChild(
+    message
+  );
+
+}
+
+
+function escapeHTML(
+  text
+) {
+
+  const div =
+  document.createElement(
+    "div"
+  );
+
+  div.textContent =
+  text;
+
+  return div.innerHTML;
+
+}
+
+
+document
+.getElementById("chatSend")
+.addEventListener(
+  "click",
+  sendChat
+);
+
+
+chatInput.addEventListener(
+  "keydown",
+  e => {
+
+    if (
+      e.key === "Enter"
+    ) {
+
+      sendChat();
 
     }
 
-
-    /* ==========================================
-       HUD
-    ========================================== */
-
-    function updateHUD() {
+    if (
+      e.key === "Escape"
+    ) {
 
       document.getElementById(
-        "job"
-      ).textContent =
-        player.userData.job;
-
-
-      document.getElementById(
-        "money"
-      ).textContent =
-        "£" +
-        player.userData.money
-          .toLocaleString();
-
-
-      document.getElementById(
-        "xp"
-      ).textContent =
-        player.userData.xp;
-
-
-      const wanted =
-        document.getElementById(
-          "wanted"
-        );
-
-
-      if (
-        player.userData.wantedLevel > 0
-      ) {
-
-        wanted.style.display =
-          "block";
-
-
-        document.getElementById(
-          "wantedLevel"
-        ).textContent =
-          player.userData.wantedLevel;
-
-      } else {
-
-        wanted.style.display =
-          "none";
-
-      }
-
-    }
-
-
-    /* ==========================================
-       CHAT
-    ========================================== */
-
-    const chatInput =
-      document.getElementById(
-        "chatInput"
-      );
-
-
-    const chatMessages =
-      document.getElementById(
-        "chatMessages"
-      );
-
-
-    const chatSend =
-      document.getElementById(
-        "chatSend"
-      );
-
-
-    function openChat() {
-
-      chatInput.focus();
-
-    }
-
-
-    function sendChatMessage() {
-
-      const message =
-        chatInput.value.trim();
-
-
-      if (
-        message.length === 0
-      ) {
-
-        return;
-
-      }
-
-
-      addChatMessage(
-        "Player",
-        message
-      );
-
-
-      chatInput.value =
-        "";
+        "chat"
+      ).style.display =
+      "none";
 
       chatInput.blur();
 
     }
 
-
-    function addChatMessage(
-      name,
-      message
-    ) {
-
-      const messageElement =
-        document.createElement(
-          "div"
-        );
+  }
+);
 
 
-      messageElement.className =
-        "chatMessage";
+/* ==========================================
+   VEHICLES
+========================================== */
+
+const vehicles = [
+
+  {
+    name: "UK Hatchback",
+    type: "Civilian",
+    price: 0,
+    color: 0xffffff,
+    emergency: false
+  },
+
+  {
+    name: "UK Saloon",
+    type: "Civilian",
+    price: 2500,
+    color: 0x222222,
+    emergency: false
+  },
+
+  {
+    name: "UK SUV",
+    type: "Civilian",
+    price: 5000,
+    color: 0x555555,
+    emergency: false
+  },
+
+  {
+    name: "Police Response",
+    type: "Police",
+    price: 0,
+    color: 0x111111,
+    emergency: true
+  },
+
+  {
+    name: "Fire Engine",
+    type: "Fire & Rescue",
+    price: 0,
+    color: 0xcc2222,
+    emergency: true
+  },
+
+  {
+    name: "Ambulance",
+    type: "Ambulance",
+    price: 0,
+    color: 0xffffff,
+    emergency: true
+  },
+
+  {
+    name: "HEMS Response",
+    type: "HEMS",
+    price: 0,
+    color: 0xffff00,
+    emergency: true
+  }
+
+];
 
 
-      const nameElement =
-        document.createElement(
-          "span"
-        );
+let currentVehicle =
+null;
+
+let currentVehicleData =
+null;
+
+let inVehicle =
+false;
 
 
-      nameElement.className =
-        "chatName";
+/* ==========================================
+   CREATE VEHICLE
+========================================== */
+
+function createVehicle(
+  data
+) {
+
+  const vehicle =
+  new THREE.Group();
 
 
-      nameElement.textContent =
-        name + ":";
+  const body =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      2.2,
+      0.7,
+      4.2
+    ),
+    new THREE.MeshStandardMaterial({
+      color: data.color
+    })
+  );
+
+  body.position.y =
+  0.9;
+
+  vehicle.add(body);
 
 
-      const textElement =
-        document.createElement(
-          "span"
-        );
+  const cabin =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      1.7,
+      0.7,
+      2
+    ),
+    new THREE.MeshStandardMaterial({
+      color: data.color
+    })
+  );
+
+  cabin.position.y =
+  1.55;
+
+  vehicle.add(cabin);
 
 
-      textElement.textContent =
-        message;
+  const glass =
+  new THREE.MeshStandardMaterial({
+    color: 0x5d9bb8,
+    roughness: 0.2
+  });
 
 
-      messageElement.appendChild(
-        nameElement
-      );
+  const frontWindow =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      1.4,
+      0.45,
+      0.08
+    ),
+    glass
+  );
+
+  frontWindow.position.set(
+    0,
+    1.58,
+    1.04
+  );
+
+  vehicle.add(frontWindow);
 
 
-      messageElement.appendChild(
-        textElement
-      );
+  const rearWindow =
+  new THREE.Mesh(
+    new THREE.BoxGeometry(
+      1.4,
+      0.45,
+      0.08
+    ),
+    glass
+  );
+
+  rearWindow.position.set(
+    0,
+    1.58,
+    -1.04
+  );
+
+  vehicle.add(rearWindow);
 
 
-      chatMessages.appendChild(
-        messageElement
-      );
+  const wheelPositions = [
+    [-1.12,0.55,1.3],
+    [1.12,0.55,1.3],
+    [-1.12,0.55,-1.3],
+    [1.12,0.55,-1.3]
+  ];
 
 
-      chatMessages.scrollTop =
-        chatMessages.scrollHeight;
+  for (
+    const pos of wheelPositions
+  ) {
 
-
-      while (
-        chatMessages.children.length >
-        50
-      ) {
-
-        chatMessages.removeChild(
-          chatMessages.firstChild
-        );
-
-      }
-
-    }
-
-
-    chatSend.addEventListener(
-      "click",
-      sendChatMessage
+    const wheel =
+    new THREE.Mesh(
+      new THREE.CylinderGeometry(
+        0.42,
+        0.42,
+        0.3,
+        20
+      ),
+      new THREE.MeshStandardMaterial({
+        color: 0x111111
+      })
     );
 
+    wheel.rotation.z =
+    Math.PI / 2;
 
-    chatInput.addEventListener(
-      "keydown",
-      event => {
-
-        if (
-          event.key === "Enter"
-        ) {
-
-          event.preventDefault();
-
-          sendChatMessage();
-
-        }
-
-
-        if (
-          event.key === "Escape"
-        ) {
-
-          chatInput.value =
-            "";
-
-          chatInput.blur();
-
-        }
-
-      }
+    wheel.position.set(
+      ...pos
     );
 
+    vehicle.add(wheel);
 
-    /* ==========================================
-       GAME LOOP
-    ========================================== */
-
-    const clock =
-      new THREE.Clock();
+  }
 
 
-    function animate() {
+  if (
+    data.emergency
+  ) {
 
-      requestAnimationFrame(
-        animate
+    const bar =
+    new THREE.Mesh(
+      new THREE.BoxGeometry(
+        1.3,
+        0.16,
+        0.35
+      ),
+      new THREE.MeshStandardMaterial({
+        color: 0x174cff,
+        emissive: 0x174cff,
+        emissiveIntensity: 1.8
+      })
+    );
+
+    bar.position.y =
+    2;
+
+    vehicle.add(bar);
+
+  }
+
+
+  vehicle.userData = {
+
+    speed: 0,
+
+    maxSpeed:
+      data.type ===
+      "Fire & Rescue"
+        ? 12
+        : 20,
+
+    acceleration: 10,
+
+    braking: 15,
+
+    steering: 2.2
+
+  };
+
+
+  return vehicle;
+
+}
+
+
+/* ==========================================
+   VEHICLE MENU
+========================================== */
+
+function openVehicleMenu() {
+
+  const menu =
+  document.getElementById(
+    "vehicleMenu"
+  );
+
+  const list =
+  document.getElementById(
+    "vehicleList"
+  );
+
+
+  list.innerHTML =
+  "";
+
+
+  vehicles.forEach(
+    vehicle => {
+
+      const card =
+      document.createElement(
+        "div"
+      );
+
+      card.className =
+      "vehicleCard";
+
+
+      const info =
+      document.createElement(
+        "div"
       );
 
 
-      const delta =
-        Math.min(
-          clock.getDelta(),
-          0.05
-        );
+      info.innerHTML =
+      `<strong>${vehicle.name}</strong>
+       <small>${vehicle.type} • ${vehicle.price === 0 ? "FREE" : "£"+vehicle.price.toLocaleString()}</small>`;
 
 
-      if (
-        inVehicle
-      ) {
-
-        updateDriving(
-          delta
-        );
-
-      } else {
-
-        updateWalking(
-          delta
-        );
-
-      }
-
-
-      updateCamera(
-        delta
+      const button =
+      document.createElement(
+        "button"
       );
 
+      button.className =
+      "vehicleButton";
 
-      updateInteraction();
-
-      updateHUD();
-
-
-      renderer.render(
-        scene,
-        camera
-      );
-
-    }
+      button.textContent =
+      "SPAWN";
 
 
-    animate();
-
-
-    /* ==========================================
-       RESIZE
-    ========================================== */
-
-    window.addEventListener(
-      "resize",
+      button.onclick =
       () => {
 
-        camera.aspect =
-          window.innerWidth /
-          window.innerHeight;
-
-
-        camera.updateProjectionMatrix();
-
-
-        renderer.setSize(
-          window.innerWidth,
-          window.innerHeight
+        spawnVehicle(
+          vehicle
         );
 
-      }
+      };
+
+
+      card.appendChild(info);
+      card.appendChild(button);
+
+      list.appendChild(card);
+
+    }
+  );
+
+
+  menu.style.display =
+  "block";
+
+}
+
+
+window.openVehicleMenu =
+openVehicleMenu;
+
+
+document
+.getElementById("closeVehicle")
+.addEventListener(
+  "click",
+  () => {
+
+    document.getElementById(
+      "vehicleMenu"
+    ).style.display =
+    "none";
+
+  }
+);
+
+
+/* ==========================================
+   SPAWN VEHICLE
+========================================== */
+
+function spawnVehicle(
+  data
+) {
+
+  if (
+    data.emergency &&
+    data.type !== playerData.job
+  ) {
+
+    if (
+      !(
+        data.type === "Police" &&
+        playerData.job === "Police"
+      ) &&
+      !(
+        data.type === "Fire & Rescue" &&
+        playerData.job === "Fire & Rescue"
+      ) &&
+      !(
+        data.type === "Ambulance" &&
+        playerData.job === "Ambulance"
+      ) &&
+      !(
+        data.type === "HEMS" &&
+        playerData.job === "HEMS"
+      )
+    ) {
+
+      notify(
+        "You need the correct emergency job."
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  if (
+    currentVehicle
+  ) {
+
+    scene.remove(
+      currentVehicle
     );
 
-  </script>
+  }
+
+
+  currentVehicleData =
+  data;
+
+
+  currentVehicle =
+  createVehicle(data);
+
+
+  currentVehicle.position.set(
+    player.position.x + 4,
+    0,
+    player.position.z
+  );
+
+
+  currentVehicle.rotation.y =
+  player.rotation.y;
+
+
+  scene.add(
+    currentVehicle
+  );
+
+
+  document.getElementById(
+    "vehicleMenu"
+  ).style.display =
+  "none";
+
+
+  notify(
+    data.name +
+    " spawned."
+  );
+
+}
+
+
+/* ==========================================
+   ENTER / EXIT VEHICLE
+========================================== */
+
+function handleInteraction() {
+
+  if (
+    inVehicle
+  ) {
+
+    exitVehicle();
+
+    return;
+
+  }
+
+
+  if (
+    currentVehicle
+  ) {
+
+    const distance =
+    player.position.distanceTo(
+      currentVehicle.position
+    );
+
+
+    if (
+      distance < 5
+    ) {
+
+      enterVehicle();
+
+      return;
+
+    }
+
+  }
+
+
+  notify(
+    "Nothing to interact with."
+  );
+
+}
+
+
+function enterVehicle() {
+
+  if (!currentVehicle)
+    return;
+
+
+  const distance =
+  player.position.distanceTo(
+    currentVehicle.position
+  );
+
+
+  if (
+    distance > 5
+  )
+    return;
+
+
+  inVehicle =
+  true;
+
+
+  player.visible =
+  false;
+
+
+  notify(
+    "Entered " +
+    currentVehicleData.name
+  );
+
+}
+
+
+function exitVehicle() {
+
+  if (!currentVehicle)
+    return;
+
+
+  inVehicle =
+  false;
+
+
+  player.visible =
+  true;
+
+
+  player.position.set(
+    currentVehicle.position.x + 3,
+    0,
+    currentVehicle.position.z
+  );
+
+
+  notify(
+    "Exited vehicle."
+  );
+
+}
+
+
+/* ==========================================
+   MOVEMENT
+========================================== */
+
+function updateWalking(
+  delta
+) {
+
+  let forward = 0;
+
+  let sideways = 0;
+
+
+  if (keys["w"])
+    forward += 1;
+
+  if (keys["s"])
+    forward -= 1;
+
+
+  /* A = LEFT */
+
+  if (keys["a"])
+    sideways -= 1;
+
+
+  /* D = RIGHT */
+
+  if (keys["d"])
+    sideways += 1;
+
+
+  if (
+    forward === 0 &&
+    sideways === 0
+  )
+    return;
+
+
+  const length =
+  Math.sqrt(
+    forward * forward +
+    sideways * sideways
+  );
+
+
+  forward /= length;
+
+  sideways /= length;
+
+
+  const speed =
+  keys["shift"]
+    ? 11
+    : 6;
+
+
+  const forwardX =
+  Math.sin(yaw);
+
+  const forwardZ =
+  Math.cos(yaw);
+
+
+  const rightX =
+  Math.cos(yaw);
+
+  const rightZ =
+  -Math.sin(yaw);
+
+
+  const moveX =
+  forwardX * forward +
+  rightX * sideways;
+
+
+  const moveZ =
+  forwardZ * forward +
+  rightZ * sideways;
+
+
+  player.position.x +=
+  moveX *
+  speed *
+  delta;
+
+
+  player.position.z +=
+  moveZ *
+  speed *
+  delta;
+
+
+  player.rotation.y =
+  Math.atan2(
+    moveX,
+    moveZ
+  );
+
+}
+
+
+function updateDriving(
+  delta
+) {
+
+  if (!currentVehicle)
+    return;
+
+
+  const data =
+  currentVehicle.userData;
+
+
+  if (keys["w"])
+    data.speed +=
+    data.acceleration * delta;
+
+  if (keys["s"])
+    data.speed -=
+    data.acceleration * delta;
+
+
+  if (
+    !keys["w"] &&
+    !keys["s"]
+  ) {
+
+    data.speed *=
+    0.97;
+
+  }
+
+
+  const max =
+  keys["shift"]
+    ? data.maxSpeed * 1.5
+    : data.maxSpeed;
+
+
+  data.speed =
+  THREE.MathUtils.clamp(
+    data.speed,
+    -max/2,
+    max
+  );
+
+
+  /* A = LEFT */
+
+  if (keys["a"])
+    currentVehicle.rotation.y +=
+    data.steering *
+    delta *
+    (data.speed / max);
+
+
+  /* D = RIGHT */
+
+  if (keys["d"])
+    currentVehicle.rotation.y -=
+    data.steering *
+    delta *
+    (data.speed / max);
+
+
+  currentVehicle.translateZ(
+    data.speed * delta
+  );
+
+
+  player.position.copy(
+    currentVehicle.position
+  );
+
+}
+
+
+/* ==========================================
+   CAMERA
+========================================== */
+
+function updateCamera(
+  delta
+) {
+
+  const target =
+  inVehicle
+    ? new THREE.Vector3(
+        currentVehicle.position.x,
+        1.5,
+        currentVehicle.position.z
+      )
+    : new THREE.Vector3(
+        player.position.x,
+        1.5,
+        player.position.z
+      );
+
+
+  const distance =
+  inVehicle
+    ? 11
+    : 9;
+
+
+  const horizontal =
+  Math.cos(pitch) *
+  distance;
+
+
+  const vertical =
+  Math.sin(pitch) *
+  distance;
+
+
+  const desired =
+  new THREE.Vector3(
+
+    target.x -
+    Math.sin(yaw) *
+    horizontal,
+
+    target.y +
+    3.2 +
+    vertical,
+
+    target.z -
+    Math.cos(yaw) *
+    horizontal
+
+  );
+
+
+  camera.position.lerp(
+    desired,
+    1 -
+    Math.pow(0.001,delta)
+  );
+
+
+  camera.lookAt(
+    target
+  );
+
+}
+
+
+/* ==========================================
+   INTERACTION UI
+========================================== */
+
+function updateInteraction() {
+
+  const box =
+  document.getElementById(
+    "interaction"
+  );
+
+
+  if (
+    inVehicle
+  ) {
+
+    box.style.display =
+    "block";
+
+    document.getElementById(
+      "interactionText"
+    ).textContent =
+    "Exit Vehicle";
+
+    return;
+
+  }
+
+
+  if (
+    currentVehicle
+  ) {
+
+    const distance =
+    player.position.distanceTo(
+      currentVehicle.position
+    );
+
+
+    if (
+      distance < 5
+    ) {
+
+      box.style.display =
+      "block";
+
+      document.getElementById(
+        "interactionText"
+      ).textContent =
+      "Enter Vehicle";
+
+      return;
+
+    }
+
+  }
+
+
+  box.style.display =
+  "none";
+
+}
+
+
+/* ==========================================
+   NOTIFY
+========================================== */
+
+function notify(
+  message
+) {
+
+  const box =
+  document.getElementById(
+    "notification"
+  );
+
+
+  box.textContent =
+  message;
+
+
+  box.style.display =
+  "block";
+
+
+  clearTimeout(
+    window.notifyTimer
+  );
+
+
+  window.notifyTimer =
+  setTimeout(
+    () => {
+
+      box.style.display =
+      "none";
+
+    },
+    2200
+  );
+
+}
+
+
+/* ==========================================
+   DEMO EMERGENCY XP
+========================================== */
+
+/*
+   These are temporary test actions.
+
+   Later these will be replaced by
+   the real multiplayer server system.
+*/
+
+window.addEventListener(
+  "keydown",
+  e => {
+
+    if (
+      playerData.job === "Police" &&
+      e.key === "1"
+    ) {
+
+      addXP(
+        150,
+        "Arrest",
+        500
+      );
+
+    }
+
+
+    if (
+      playerData.job === "Police" &&
+      e.key === "2"
+    ) {
+
+      addXP(
+        100,
+        "Vehicle pursuit"
+      );
+
+    }
+
+
+    if (
+      playerData.job === "Fire & Rescue" &&
+      e.key === "1"
+    ) {
+
+      addXP(
+        100,
+        "Fire call",
+        250
+      );
+
+    }
+
+
+    if (
+      playerData.job === "Ambulance" &&
+      e.key === "1"
+    ) {
+
+      addXP(
+        125,
+        "Patient treated",
+        300
+      );
+
+    }
+
+
+    if (
+      playerData.job === "HEMS" &&
+      e.key === "1"
+    ) {
+
+      addXP(
+        200,
+        "HEMS response",
+        500
+      );
+
+    }
+
+  }
+);
+
+
+/* ==========================================
+   RESIZE
+========================================== */
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    camera.aspect =
+    innerWidth /
+    innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+      innerWidth,
+      innerHeight
+    );
+
+  }
+);
+
+
+/* ==========================================
+   GAME LOOP
+========================================== */
+
+const clock =
+new THREE.Clock();
+
+
+function animate() {
+
+  requestAnimationFrame(
+    animate
+  );
+
+
+  const delta =
+  Math.min(
+    clock.getDelta(),
+    0.05
+  );
+
+
+  if (
+    inVehicle
+  ) {
+
+    updateDriving(
+      delta
+    );
+
+  } else {
+
+    updateWalking(
+      delta
+    );
+
+  }
+
+
+  updateCamera(
+    delta
+  );
+
+
+  updateInteraction();
+
+  updateHUD();
+
+
+  renderer.render(
+    scene,
+    camera
+  );
+
+}
+
+
+updateHUD();
+
+animate();
+
+</script>
 
 </body>
 </html>
