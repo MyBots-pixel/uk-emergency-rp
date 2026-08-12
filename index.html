@@ -11,327 +11,305 @@
 
 <body>
 
-    <!-- 3D GAME -->
-    <div id="game"></div>
+<div id="game"></div>
 
-    <!-- HUD -->
-    <div id="hud">
+<!-- HUD -->
 
-        <!-- XP -->
-        <div id="xpPanel">
-            <div id="jobName">👤 CIVILIAN</div>
+<div id="xpPanel">
+    <div class="hudJob" id="jobName">👤 CIVILIAN</div>
+    <div class="hudLevel" id="levelText">LEVEL 1</div>
+    <div class="hudXP" id="xpText">0 / 1000 XP</div>
 
-            <div id="levelText">
-                LEVEL 1
-            </div>
+    <div class="xpBackground">
+        <div id="xpBar"></div>
+    </div>
 
-            <div id="xpText">
-                0 / 1000 XP
-            </div>
+    <div id="xpReason">Ready.</div>
+</div>
 
-            <div class="xpBackground">
-                <div id="xpBar"></div>
-            </div>
+<div id="moneyPanel">
+    💷 £<span id="money">500</span>
+</div>
 
-            <div id="xpReason">
-                Ready.
-            </div>
+<div id="wantedPanel">
+    🚨 WANTED
+    <span id="wantedStars">0</span>/5
+</div>
+
+<div id="eventBadge" class="hidden">
+    🌌 <span id="eventName">GALAXY EVENT</span>
+</div>
+
+<div id="xpNotification"></div>
+<div id="notification"></div>
+
+<div id="controls">
+    WASD · SHIFT · E · TAB · P · T · RMB
+</div>
+
+<div id="interaction">
+    <span class="key">E</span>
+    <span id="interactionText">Interact</span>
+</div>
+
+
+<!-- RADIO -->
+
+<div id="radioPanel" class="glassPanel hidden">
+    <div class="panelTitle">
+        📻 RADIO
+        <button class="panelClose" data-close="radioPanel">×</button>
+    </div>
+
+    <div class="radioStatus">
+        <span class="radioDot"></span>
+        <span id="radioStatus">TRANSMITTING</span>
+    </div>
+
+    <div class="radioMessages" id="radioMessages">
+        <div>DISPATCH: All units stand by.</div>
+    </div>
+
+    <div class="radioButtons">
+        <button data-radio="transmit">Transmit (T)</button>
+        <button data-radio="pursuit">In Pursuit</button>
+        <button data-radio="backup">Request Backup</button>
+        <button data-radio="enroute">En Route</button>
+        <button data-radio="scene">On Scene</button>
+    </div>
+</div>
+
+
+<!-- CHAT -->
+
+<div id="chat" class="glassPanel hidden">
+
+    <div class="panelTitle">
+        💬 CHAT
+        <button class="panelClose" data-close="chat">×</button>
+    </div>
+
+    <div id="chatMessages"></div>
+
+    <div class="chatInput">
+        <input
+            id="chatInput"
+            maxlength="180"
+            placeholder="Type a message..."
+        >
+
+        <button id="chatSend">
+            SEND
+        </button>
+    </div>
+
+</div>
+
+
+<!-- RADIAL -->
+
+<div id="radialOverlay" class="hidden">
+
+    <div id="radial">
+
+        <div id="radialCenter">
+            <strong>TAB</strong>
+            <small>Select</small>
         </div>
 
-        <!-- MONEY -->
-        <div id="moneyPanel">
-            💷 £<span id="money">500</span>
-        </div>
+        <button class="radialItem top" data-action="jobs">
+            👔
+            <span>Jobs</span>
+        </button>
 
-        <!-- WANTED -->
-        <div id="wantedPanel">
-            🚨 WANTED
-            <span id="wantedStars">0</span>/5
-        </div>
+        <button class="radialItem topRight" data-action="vehicles">
+            🚗
+            <span>Vehicles</span>
+        </button>
 
-        <!-- CONTROLS -->
-        <div id="controls">
-            WASD Move · SHIFT Sprint · E Interact · TAB Menu · P Phone · T Radio · RMB Camera
-        </div>
+        <button class="radialItem right" data-action="phone">
+            📱
+            <span>Phone</span>
+        </button>
 
-        <!-- INTERACTION -->
-        <div id="interaction">
-            <span class="key">E</span>
-            <span id="interactionText">Interact</span>
-        </div>
+        <button class="radialItem bottomRight" data-action="wanted">
+            🚨
+            <span>Wanted</span>
+        </button>
 
-        <!-- NOTIFICATIONS -->
-        <div id="notification"></div>
+        <button class="radialItem bottom" data-action="events">
+            🌌
+            <span>Events</span>
+        </button>
 
-        <div id="xpNotification"></div>
+        <button class="radialItem bottomLeft" data-action="radio">
+            📻
+            <span>Radio</span>
+        </button>
+
+        <button class="radialItem left" data-action="chat">
+            💬
+            <span>Chat</span>
+        </button>
+
+        <button class="radialItem topLeft" data-action="settings">
+            ⚙️
+            <span>Settings</span>
+        </button>
 
     </div>
 
+</div>
 
-    <!-- CHAT -->
 
-    <div id="chat" class="panel hidden">
+<!-- PHONE -->
 
-        <div class="panelTitle">
-            💬 CHAT
+<div id="phone" class="device hidden">
+
+    <div class="phoneScreen">
+
+        <div class="phoneHeader">
+            <span>📱 UK RESPONSE</span>
+
+            <button data-close="phone">
+                ×
+            </button>
         </div>
 
-        <div id="chatMessages"></div>
-
-        <div class="chatInput">
-
-            <input
-                id="chatInput"
-                maxlength="180"
-                placeholder="Type a message..."
-            >
-
-            <button id="chatSend">
-                SEND
-            </button>
-
+        <div class="phoneTime" id="phoneTime">
+            12:00
         </div>
 
-    </div>
+        <div class="phoneApps">
 
-
-    <!-- RADIAL MENU -->
-
-    <div id="radialOverlay" class="hidden">
-
-        <div id="radial">
-
-            <div id="radialCenter">
-                TAB
-                <small>Select</small>
-            </div>
-
-
-            <button
-                class="radialItem top"
-                data-action="police"
-            >
-                🚔
-                <span>Police</span>
+            <button data-phone="jobs">
+                👔
+                <span>Jobs</span>
             </button>
 
-
-            <button
-                class="radialItem topRight"
-                data-action="ambulance"
-            >
-                🚑
-                <span>Ambulance</span>
-            </button>
-
-
-            <button
-                class="radialItem right"
-                data-action="vehicles"
-            >
+            <button data-phone="vehicles">
                 🚗
                 <span>Vehicles</span>
             </button>
 
-
-            <button
-                class="radialItem bottomRight"
-                data-action="civilian"
-            >
-                👤
-                <span>Civilian</span>
+            <button data-phone="radio">
+                📻
+                <span>Radio</span>
             </button>
 
-
-            <button
-                class="radialItem bottom"
-                data-action="hems"
-            >
-                🚁
-                <span>HEMS</span>
+            <button data-phone="events">
+                🌌
+                <span>Events</span>
             </button>
 
-
-            <button
-                class="radialItem bottomLeft"
-                data-action="fire"
-            >
-                🚒
-                <span>Fire</span>
+            <button data-phone="wanted">
+                🚨
+                <span>Wanted</span>
             </button>
 
-
-            <button
-                class="radialItem left"
-                data-action="phone"
-            >
-                📱
-                <span>Phone</span>
+            <button data-phone="players">
+                👥
+                <span>Players</span>
             </button>
 
-
-            <button
-                class="radialItem topLeft"
-                data-action="settings"
-            >
+            <button data-phone="settings">
                 ⚙️
                 <span>Settings</span>
             </button>
 
+            <button data-phone="chat">
+                💬
+                <span>Chat</span>
+            </button>
+
+        </div>
+
+        <div id="phoneInformation">
+            Welcome to UK Response RP.
         </div>
 
     </div>
 
-
-    <!-- PHONE -->
-
-    <div id="phone" class="device hidden">
-
-        <div class="phoneScreen">
-
-            <div class="phoneHeader">
-
-                📱 UK RESPONSE
-
-                <button data-close="phone">
-                    ×
-                </button>
-
-            </div>
+</div>
 
 
-            <div class="phoneApps">
+<!-- GENERAL MODAL -->
 
-                <button data-phone="radio">
-                    📻
-                    <span>Radio</span>
-                </button>
+<div id="modal" class="modal hidden">
 
-                <button data-phone="vehicles">
-                    🚗
-                    <span>Vehicles</span>
-                </button>
+    <div class="modalBox">
 
-                <button data-phone="events">
-                    🌌
-                    <span>Events</span>
-                </button>
+        <div class="modalHeader">
 
-                <button data-phone="wanted">
-                    🚨
-                    <span>Wanted</span>
-                </button>
+            <span id="modalTitle">
+                Panel
+            </span>
 
-                <button data-phone="players">
-                    👥
-                    <span>Players</span>
-                </button>
-
-                <button data-phone="settings">
-                    ⚙️
-                    <span>Settings</span>
-                </button>
-
-                <button data-phone="chat">
-                    💬
-                    <span>Chat</span>
-                </button>
-
-                <button data-phone="jobs">
-                    👔
-                    <span>Jobs</span>
-                </button>
-
-            </div>
-
-
-            <div id="phoneInformation">
-
-                Welcome to UK Response RP.
-
-            </div>
+            <button id="modalClose">
+                ×
+            </button>
 
         </div>
 
+        <div id="modalBody"></div>
+
     </div>
 
-
-    <!-- GENERAL MODAL -->
-
-    <div id="modal" class="modal hidden">
-
-        <div class="modalBox">
-
-            <div class="modalHeader">
-
-                <span id="modalTitle">
-                    Panel
-                </span>
-
-                <button id="modalClose">
-                    ×
-                </button>
-
-            </div>
+</div>
 
 
-            <div id="modalBody"></div>
+<!-- OWNER ADMIN -->
+
+<div id="adminPanel" class="modal hidden">
+
+    <div class="modalBox adminBox">
+
+        <div class="modalHeader">
+
+            <span>
+                👑 OWNER ADMIN PANEL
+            </span>
+
+            <button data-close="adminPanel">
+                ×
+            </button>
 
         </div>
 
-    </div>
+        <div class="adminOwnerBadge">
+            OWNER ACCESS ONLY
+        </div>
 
+        <div class="adminTabs">
 
-    <!-- ADMIN PANEL -->
+            <button data-admin-tab="players">
+                PLAYERS
+            </button>
 
-    <div id="adminPanel" class="modal hidden">
+            <button data-admin-tab="vehicles">
+                VEHICLES
+            </button>
 
-        <div class="modalBox adminBox">
+            <button data-admin-tab="events">
+                EVENTS
+            </button>
 
-            <div class="modalHeader">
-
-                <span>
-                    👑 OWNER ADMIN PANEL
-                </span>
-
-                <button data-close="adminPanel">
-                    ×
-                </button>
-
-            </div>
-
-
-            <div class="adminTabs">
-
-                <button data-admin-tab="players">
-                    PLAYERS
-                </button>
-
-                <button data-admin-tab="vehicles">
-                    VEHICLES
-                </button>
-
-                <button data-admin-tab="events">
-                    EVENTS
-                </button>
-
-                <button data-admin-tab="world">
-                    WORLD
-                </button>
-
-            </div>
-
-
-            <div id="adminBody"></div>
+            <button data-admin-tab="world">
+                WORLD
+            </button>
 
         </div>
 
+        <div id="adminBody"></div>
+
     </div>
 
+</div>
 
-    <!-- THREE.JS -->
 
-    <script type="module" src="app.js"></script>
+<!-- THREE.JS -->
+
+<script type="module" src="app.js"></script>
 
 </body>
 </html>
